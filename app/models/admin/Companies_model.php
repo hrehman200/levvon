@@ -303,4 +303,86 @@ class Companies_model extends CI_Model
         return FALSE;
     }
 
+    // **************************************** [CUSTOMER NOTES ****************************************/
+    /**
+     * @param $data
+     * @return mixed
+     */
+    public function addNote($data) {
+
+        $data['isDeleted'] = 0;
+        $data['modified'] = date('Y-m-d H:i:s');
+
+        return $this->db->insert('company_notes', $data);
+    }
+
+    /**
+     * @param $note_id
+     * @param $data
+     * @return bool
+     */
+    public function updateNote($note_id, $data) {
+
+        $data['modified'] = date('Y-m-d H:i:s');
+
+        if ($this->db->update('company_notes', $data, array('id' => $note_id))) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @param $note_id
+     * @return bool
+     */
+    public function deleteNote($note_id) {
+
+        $data['isDeleted'] = 1;
+        $data['modified'] = date('Y-m-d H:i:s');
+
+        if ($this->db->update('company_notes', $data, array('id' => $note_id))) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * @param $customer_id
+     * @param $page
+     * @return mixed
+     */
+    public function getNotes($customer_id, $page) {
+        $this->datatables->select('id, created, companyTitle, description')
+            ->from('company_notes')
+            ->where('companyId', $customer_id)
+            ->where('isDeleted', 0)
+            ->add_column("Actions", "<div class=\"text-center\">
+                <a class=\"tip\" title='" . lang("edit_note") . "' href='" . admin_url('customers/edit_note/'.$customer_id.'/'.$page.'/$1') . "' data-toggle='modal' data-target='#myModal2'>
+                    <i class=\"fa fa-edit\"></i>
+                </a>
+                <a href='#' class='tip po' title='<b>" . lang("delete_note") . "</b>' data-content=\"<p>" . lang('r_u_sure') . "</p>
+                    <a class='btn btn-danger po-delete' href='" . admin_url('customers/delete_note/$1') . "'>" . lang('i_m_sure') . "</a>
+                    <button class='btn po-close'>" . lang('no') . "</button>\"  rel='popover'><i class=\"fa fa-trash-o\"></i>
+                </a>
+            </div>", "id")
+            ->unset_column('id');
+        return $this->datatables->generate();
+    }
+
+    /**
+     * @param $note_id
+     * @return bool
+     */
+    public function getNoteById($note_id) {
+        $q = $this->db->get_where('company_notes', array('id' => $note_id), 1);
+        if ($q->num_rows() > 0) {
+            return $q->row();
+        }
+        return FALSE;
+    }
+
+    // **************************************** CUSTOMER NOTES] ****************************************/
+
+
+
 }

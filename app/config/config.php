@@ -17,7 +17,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | environments.
 |
 */
-$config['base_url'] = 'http://www.levvon.com/gaddyf/';
+$config['base_url'] = 'http://localhost/levvon/';  // 'http://www.levvon.com/gaddyf/';
 
 /*
 |--------------------------------------------------------------------------
@@ -305,7 +305,7 @@ $config['cache_query_string'] = FALSE;
 | http://codeigniter.com/user_guide/libraries/encryption.html
 |
 */
-$config['encryption_key'] = 'xyz'; // FM9nCgXE0a3DzrOSq6PxtN1e57lYm4sGAKTLw
+$config['encryption_key'] = 'FM9nCgXE0a3DzrOSq6PxtN1e57lYm4sGAKTLw';
 
 /*
 |--------------------------------------------------------------------------

@@ -1926,6 +1926,7 @@ class Reports extends MY_Controller
         $this->data['users'] = $this->reports_model->getStaff();
         $this->data['warehouses'] = $this->site->getAllWarehouses();
         $this->data['billers'] = $this->site->getAllCompanies('biller');
+        $this->data['page'] = 'reports';
 
         $this->data['error'] = validation_errors() ? validation_errors() : $this->session->flashdata('error');
 
@@ -2922,6 +2923,15 @@ class Reports extends MY_Controller
             ->join('users', 'users.id=deposits.created_by', 'left')
             ->where($this->db->dbprefix('deposits').'.company_id', $company_id);
         echo $this->datatables->generate();
+    }
+
+    /**
+     * @param $customer_id
+     */
+    function getAverageReportForCustomer($customer_id) {
+        $this->sma->checkPermissions('sales', TRUE);
+        $response = $this->reports_model->getAverageReportForCustomer($customer_id);
+        echo json_encode($response);
     }
 
 }

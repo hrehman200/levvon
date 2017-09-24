@@ -39,7 +39,28 @@ class Customers extends MY_Controller
             ->select("id, company, name, email, phone, price_group_name, customer_group_name, vat_no, deposit_amount, award_points")
             ->from("companies")
             ->where('group_name', 'customer')
-            ->add_column("Actions", "<div class=\"text-center\"><a class=\"tip\" title='" . lang("list_deposits") . "' href='" . admin_url('customers/deposits/$1') . "' data-toggle='modal' data-target='#myModal'><i class=\"fa fa-money\"></i></a> <a class=\"tip\" title='" . lang("add_deposit") . "' href='" . admin_url('customers/add_deposit/$1') . "' data-toggle='modal' data-target='#myModal'><i class=\"fa fa-plus\"></i></a> <a class=\"tip\" title='" . lang("list_addresses") . "' href='" . admin_url('customers/addresses/$1') . "' data-toggle='modal' data-target='#myModal'><i class=\"fa fa-location-arrow\"></i></a> <a class=\"tip\" title='" . lang("list_users") . "' href='" . admin_url('customers/users/$1') . "' data-toggle='modal' data-target='#myModal'><i class=\"fa fa-users\"></i></a> <a class=\"tip\" title='" . lang("add_user") . "' href='" . admin_url('customers/add_user/$1') . "' data-toggle='modal' data-target='#myModal'><i class=\"fa fa-user-plus\"></i></a> <a class=\"tip\" title='" . lang("edit_customer") . "' href='" . admin_url('customers/edit/$1') . "' data-toggle='modal' data-target='#myModal'><i class=\"fa fa-edit\"></i></a> <a href='#' class='tip po' title='<b>" . lang("delete_customer") . "</b>' data-content=\"<p>" . lang('r_u_sure') . "</p><a class='btn btn-danger po-delete' href='" . admin_url('customers/delete/$1') . "'>" . lang('i_m_sure') . "</a> <button class='btn po-close'>" . lang('no') . "</button>\"  rel='popover'><i class=\"fa fa-trash-o\"></i></a></div>", "id");
+            ->add_column("Actions", "<div class=\"text-center\">
+            <a class=\"tip\" title='" . lang("list_deposits") . "' href='" . admin_url('customers/deposits/$1') . "' data-toggle='modal' data-target='#myModal'>
+                <i class=\"fa fa-money\"></i>
+            </a>
+            <a class=\"tip\" title='" . lang("add_deposit") . "' href='" . admin_url('customers/add_deposit/$1') . "' data-toggle='modal' data-target='#myModal'>
+                <i class=\"fa fa-plus\"></i>
+            </a> <a class=\"tip\" title='" . lang("list_addresses") . "' href='" . admin_url('customers/addresses/$1') . "' data-toggle='modal' data-target='#myModal'>
+                <i class=\"fa fa-location-arrow\"></i>
+            </a>
+            </a> <a class=\"tip\" title='" . lang("list_notes") . "' href='" . admin_url('customers/notes/$1/customers') . "' data-toggle='modal' data-target='#myModal'>
+                <i class=\"fa fa-newspaper-o\"></i>
+            </a>
+            <a class=\"tip\" title='" . lang("list_users") . "' href='" . admin_url('customers/users/$1') . "' data-toggle='modal' data-target='#myModal'>
+                <i class=\"fa fa-users\"></i></a> <a class=\"tip\" title='" . lang("add_user") . "' href='" . admin_url('customers/add_user/$1') . "' data-toggle='modal' data-target='#myModal'><i class=\"fa fa-user-plus\"></i>
+            </a>
+            <a class=\"tip\" title='" . lang("edit_customer") . "' href='" . admin_url('customers/edit/$1') . "' data-toggle='modal' data-target='#myModal'>
+                <i class=\"fa fa-edit\"></i>
+            </a>
+            <a href='#' class='tip po' title='<b>" . lang("delete_customer") . "</b>' data-content=\"<p>" . lang('r_u_sure') . "</p><a class='btn btn-danger po-delete' href='" . admin_url('customers/delete/$1') . "'>" . lang('i_m_sure') . "</a> <button class='btn po-close'>" . lang('no') . "</button>\"  rel='popover'>
+                <i class=\"fa fa-trash-o\"></i>
+            </a>
+        </div>", "id");
         //->unset_column('id');
         echo $this->datatables->generate();
     }
@@ -701,5 +722,110 @@ class Customers extends MY_Controller
             admin_redirect("customers");
         }
     }
+
+
+    // **************************************** [CUSTOMER NOTES ****************************************/
+
+    /**
+     * @param $company_id
+     * @param null $note_id
+     */
+    function edit_note($company_id, $page = 'customers', $note_id = NULL) {
+        $this->sma->checkPermissions('index', true);
+
+        if($note_id != null) {
+            $note = $this->companies_model->getNoteByID($note_id);
+        }
+        $company = $this->companies_model->getCompanyByID($company_id);
+
+        if ($this->Owner || $this->Admin) {
+            $this->form_validation->set_rules('created', lang("created"), 'required');
+        }
+        $this->form_validation->set_rules('title', lang("title"), 'required');
+        $this->form_validation->set_rules('note', lang("note"), 'required');
+
+        if ($this->input->post('edit_note')) {
+
+            if($this->form_validation->run() == true) {
+                $created = str_replace('/', '-', $this->input->post('created'));
+                $data = array(
+                    'created' => date('Y-m-d H:i:s' , strtotime($created)),
+                    'companyTitle' => $this->input->post('title'),
+                    'description'  => $this->input->post('note'),
+                    'companyId' => $company_id
+                );
+
+                if($note_id == null) {
+                    $success = $this->companies_model->addNote($data);
+                } else {
+                    $success = $this->companies_model->updateNote($note_id, $data);
+                }
+
+                if($success) {
+                    $this->session->set_flashdata('message', lang('note_updated'));
+                } else {
+                    $this->session->set_flashdata('error', lang('note_not_updated'));
+                }
+            } else {
+                $this->session->set_flashdata('error', validation_errors());
+            }
+
+            if($page == 'customers') {
+                admin_redirect('customers');
+            } else {
+                admin_redirect('reports/customer_report/' . $company_id);
+            }
+
+        } else {
+            $this->data['error'] = (validation_errors() ? validation_errors() : $this->session->flashdata('error'));
+            $this->data['modal_js'] = $this->site->modal_js();
+            $this->data['company'] = $company;
+            $this->data['note'] = @$note;
+            $this->data['page'] = $page;
+
+            $this->load->view($this->theme . 'customers/notes/edit', $this->data);
+        }
+    }
+
+    /**
+     * @param $id
+     */
+    public function delete_note($id)
+    {
+        $this->sma->checkPermissions(NULL, TRUE);
+
+        if ($this->companies_model->deleteNote($id)) {
+            $this->sma->send_json(array('error' => 0, 'msg' => lang("note_deleted")));
+        }
+    }
+
+    /**
+     * @param $customer_id
+     */
+    function get_notes($customer_id, $page) {
+        $this->sma->checkPermissions('sales', TRUE);
+
+        $this->load->library('datatables');
+        $this->load->admin_model('companies_model');
+
+        $response = $this->companies_model->getNotes($customer_id, $page);
+        echo $response;
+    }
+
+    /**
+     * @param $company_id
+     * @param $page
+     */
+    function notes($company_id, $page) {
+        $this->sma->checkPermissions(false, true);
+
+        $this->data['error'] = (validation_errors() ? validation_errors() : $this->session->flashdata('error'));
+        $this->data['modal_js'] = $this->site->modal_js();
+        $this->data['customer'] = $this->companies_model->getCompanyByID($company_id);
+        $this->data['page'] = $page;
+        $this->load->view($this->theme . 'customers/notes/view', $this->data);
+    }
+
+    // **************************************** CUSTOMER NOTES] ****************************************/
 
 }

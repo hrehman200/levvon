@@ -620,4 +620,54 @@ class Reports_model extends CI_Model
         return FALSE;
     }
 
+    /**
+     * @param $customer_id
+     * @return array
+     */
+    function getAverageReportForCustomer($customer_id) {
+        $query = $this->db->query(sprintf('
+          SELECT si.product_name, AVG(si.quantity) AS avg_product_name
+          FROM sma_sales s
+          INNER JOIN sma_sale_items si ON si.sale_id = s.id
+          WHERE customer_id = "%d"
+          GROUP BY si.product_name', $customer_id));
+
+        $avg_product_name = '';
+        $arr = $query->result_array();
+        for($i = 0; $i<count($arr); $i++) {
+            $row = $arr[$i];
+            $avg_product_name .= sprintf('%s(%d)', $row['product_name'], $row['avg_product_name']);
+
+            if($i < count($arr) - 1) {
+                $avg_product_name .= ', ';
+            }
+        }
+
+        $query = $this->db->query(sprintf(
+            'SELECT DATEDIFF(NOW(), MAX(date)) AS days_inactive FROM sma_sales WHERE customer_id = "%d" ', $customer_id
+        ));
+        $row = $query->result_array();
+        $days_inactive = $row[0]['days_inactive'];
+
+        $query = $this->db->query(sprintf(
+           'SELECT
+              id,
+              date,
+              AVG(DATEDIFF(
+                date,
+                (SELECT MAX(date) FROM sma_sales WHERE date < t.date AND customer_id = "%d")
+              )) AS avg_buying_date
+            FROM sma_sales AS t
+            WHERE customer_id = "%d" ', $customer_id, $customer_id
+        ));
+        $row = $query->result_array();
+        $avg_buying_date = $row[0]['avg_buying_date'];
+
+        return array(
+            'avg_buying_date' => ceil($avg_buying_date),
+            'avg_product_name' => $avg_product_name,
+            'days_inactive' => $days_inactive
+        );
+    }
+
 }

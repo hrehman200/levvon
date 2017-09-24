@@ -66,6 +66,7 @@
     <li class=""><a href="#payments-con" class="tab-grey"><?= lang('payments') ?></a></li>
     <li class=""><a href="#quotes-con" class="tab-grey"><?= lang('quotes') ?></a></li>
     <li class=""><a href="#deposits-con" class="tab-grey"><?= lang('deposits') ?></a></li>
+    <li class=""><a href="#notes-con" class="tab-grey"><?= lang('Notes') ?></a></li>
 </ul>
 
 <div class="tab-content">
@@ -269,6 +270,13 @@
                             <div class="clearfix"></div>
 
                             <div class="table-responsive">
+
+                                <div class="well well-sm">
+                                    Average Buying Days: <b><span class="spAvgBuyingDate"></span></b><br/>
+                                    Average Product Name and Quantity: <b><span class="spAvgProductName"></span></b><br/>
+                                    Number of Days Inactive: <b><span class="spNoOfDaysInactive"></span></b><br/>
+                                </div>
+
                                 <table id="SlRData"
                                 class="table table-bordered table-hover table-striped table-condensed reports-table reports-table">
                                 <thead>
@@ -476,6 +484,13 @@
                         <div class="clearfix"></div>
 
                         <div class="table-responsive">
+
+                            <div class="well well-sm">
+                                Average Buying Days: <b><span class="spAvgBuyingDate"></span></b><br/>
+                                Average Product Name and Quantity: <b><span class="spAvgProductName"></span></b><br/>
+                                Number of Days Inactive: <b><span class="spNoOfDaysInactive"></span></b><br/>
+                            </div>
+
                             <table id="PayRData"
                             class="table table-bordered table-hover table-striped table-condensed reports-table reports-table">
 
@@ -581,6 +596,13 @@
                     <p class="introtext"><?php echo lang('list_results'); ?></p>
 
                     <div class="table-responsive">
+
+                        <div class="well well-sm">
+                            Average Buying Days: <b><span class="spAvgBuyingDate"></span></b><br/>
+                            Average Product Name and Quantity: <b><span class="spAvgProductName"></span></b><br/>
+                            Number of Days Inactive: <b><span class="spNoOfDaysInactive"></span></b><br/>
+                        </div>
+
                         <table id="QuRData" class="table table-bordered table-hover table-striped table-condensed reports-table">
                             <thead>
                                 <tr>
@@ -674,6 +696,13 @@
                     <p class="introtext"><?php echo lang('list_results'); ?></p>
 
                     <div class="table-responsive">
+
+                        <div class="well well-sm">
+                            Average Buying Days: <b><span class="spAvgBuyingDate"></span></b><br/>
+                            Average Product Name and Quantity: <b><span class="spAvgProductName"></span></b><br/>
+                            Number of Days Inactive: <b><span class="spNoOfDaysInactive"></span></b><br/>
+                        </div>
+
                         <table id="DepData" class="table table-bordered table-condensed table-hover table-striped reports-table">
                             <thead>
                             <tr class="primary">
@@ -696,6 +725,107 @@
                                 <th class="col-xs-1"></th>
                                 <th class="col-xs-2"></th>
                                 <th class="col-xs-6"></th>
+                            </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="notes-con" class="tab-pane fade in">
+    <script type="text/javascript">
+        $(document).ready(function () {
+            oTable = $('#notesData').dataTable({
+                "aaSorting": [[0, "desc"]],
+                "aLengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "<?= lang('all') ?>"]],
+                "iDisplayLength": <?= $Settings->rows_per_page ?>,
+                'bProcessing': true, 'bServerSide': true,
+                'sAjaxSource': '<?= admin_url('customers/get_notes/'.$user_id.'/'.$page) ?>',
+                'fnRowCallback': function (nRow, aData, iDisplayIndex) {
+                    //nRow.id = aData[0];
+                    nRow.className = 'customer_notes_link';
+                    return nRow;
+                },
+                'fnServerData': function (sSource, aoData, fnCallback) {
+                    aoData.push({
+                        "name": "<?= $this->security->get_csrf_token_name() ?>",
+                        "value": "<?= $this->security->get_csrf_hash() ?>"
+                    });
+                    $.ajax({'dataType': 'json', 'type': 'POST', 'url': sSource, 'data': aoData, 'success': fnCallback});
+                },
+                //"aoColumns": [{"mRender": fld}, {"mRender": currencyFormat}, null, null, {"mRender": decode_html}]
+            }).fnSetFilteringDelay().dtFilter([
+                {column_number: 0, filter_default_label: "[<?=lang('Created');?> (yyyy-mm-dd)]", filter_type: "text", data: []},
+                {column_number: 1, filter_default_label: "[<?=lang('Title');?>]", filter_type: "text", data: []},
+                {column_number: 2, filter_default_label: "[<?=lang('Note');?>]", filter_type: "text", data: []},
+            ], "footer");
+        });
+    </script>
+    <div class="box">
+        <div class="box-header">
+            <h2 class="blue"><i class="fa-fw fa fa-heart-o nb"></i><?=  lang('Notes'); ?>
+            </h2>
+
+            <div class="box-icon">
+                <ul class="btn-tasks">
+                    <li class="dropdown">
+                        <a href="#" id="pdf1" class="tip" title="<?= lang('download_pdf') ?>">
+                            <i class="icon fa fa-file-pdf-o"></i>
+                        </a>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" id="xls1" class="tip" title="<?= lang('download_xls') ?>">
+                            <i class="icon fa fa-file-excel-o"></i>
+                        </a>
+                    </li>
+                    <li class="dropdown">
+                        <a href="#" id="image1" class="tip image" title="<?= lang('save_image') ?>">
+                            <i class="icon fa fa-file-picture-o"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="box-content">
+            <div class="row">
+                <div class="col-lg-12">
+
+                    <div class="table-responsive">
+
+                        <div class="well well-sm">
+                            Average Buying Days: <b><span class="spAvgBuyingDate"></span></b><br/>
+                            Average Product Name and Quantity: <b><span class="spAvgProductName"></span></b><br/>
+                            Number of Days Inactive: <b><span class="spNoOfDaysInactive"></span></b><br/>
+                        </div>
+
+                        <table id="notesData" class="table table-bordered table-condensed table-hover table-striped reports-table">
+                            <thead>
+                            <tr class="primary">
+                                <th class="col-xs-2"><?= lang("created"); ?></th>
+                                <th class="col-xs-2"><?= lang("title"); ?></th>
+                                <th class="col-xs-7"><?= lang("note"); ?></th>
+                                <th style="width:85px;">
+                                    <a class="tip" style="color:white;" title='<?=lang("add_note")?>' href="<?=admin_url('customers/edit_note/'.$user_id."/".$page)?>" data-toggle='modal' data-target='#myModal2'>
+                                        <i class="fa fa-plus"></i>
+                                    </a>
+                                    <?= lang("actions"); ?>
+                                </th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td colspan="3" class="dataTables_empty"><?= lang('loading_data_from_server') ?></td>
+                            </tr>
+                            </tbody>
+                            <tfoot>
+                            <tr class="dtFilter">
+                                <th class="col-xs-2"></th>
+                                <th class="col-xs-2"></th>
+                                <th class="col-xs-7"></th>
+                                <th></th>
                             </tr>
                             </tfoot>
                         </table>
@@ -748,6 +878,18 @@ $(document).ready(function () {
             }
         });
         return false;
+    });
+
+    $.ajax({
+        type: 'get',
+        url: '<?= admin_url('reports/getAverageReportForCustomer/'.$user_id); ?>',
+        dataType: "json",
+        data: {},
+        success: function (data) {
+            $('.spAvgProductName').html(data.avg_product_name);
+            $('.spAvgBuyingDate').html(data.avg_buying_date);
+            $('.spNoOfDaysInactive').html(data.days_inactive);
+        }
     });
 });
 </script>
