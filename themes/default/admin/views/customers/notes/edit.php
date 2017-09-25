@@ -13,14 +13,6 @@
 
             <div class="row">
                 <div class="col-sm-12">
-                    <?php if ($Owner || $Admin) { ?>
-                        <div class="form-group">
-                            <?php echo lang('date', 'date'); ?>*
-                            <div class="controls">
-                                <?php echo form_input('created', set_value('created', $this->sma->hrld((($note == null)?date('Y-m-d H:i:s'):$note->created))), 'class="form-control datetime" id="created" required="required"'); ?>
-                            </div>
-                        </div>
-                    <?php } ?>
 
                     <div class="form-group">
                         <?php echo lang('title', 'Title'); ?>*

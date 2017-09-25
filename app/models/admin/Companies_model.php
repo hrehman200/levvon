@@ -311,6 +311,7 @@ class Companies_model extends CI_Model
     public function addNote($data) {
 
         $data['isDeleted'] = 0;
+        $data['created'] = date('Y-m-d H:i:s');
         $data['modified'] = date('Y-m-d H:i:s');
 
         return $this->db->insert('company_notes', $data);

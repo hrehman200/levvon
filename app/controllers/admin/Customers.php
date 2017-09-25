@@ -737,10 +737,7 @@ class Customers extends MY_Controller
             $note = $this->companies_model->getNoteByID($note_id);
         }
         $company = $this->companies_model->getCompanyByID($company_id);
-
-        if ($this->Owner || $this->Admin) {
-            $this->form_validation->set_rules('created', lang("created"), 'required');
-        }
+        
         $this->form_validation->set_rules('title', lang("title"), 'required');
         $this->form_validation->set_rules('note', lang("note"), 'required');
 
@@ -749,7 +746,6 @@ class Customers extends MY_Controller
             if($this->form_validation->run() == true) {
                 $created = str_replace('/', '-', $this->input->post('created'));
                 $data = array(
-                    'created' => date('Y-m-d H:i:s' , strtotime($created)),
                     'companyTitle' => $this->input->post('title'),
                     'description'  => $this->input->post('note'),
                     'companyId' => $company_id

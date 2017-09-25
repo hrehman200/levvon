@@ -755,6 +755,7 @@ a#main-menu-act i:hover {
     border: none;
     padding-bottom: 1px;
     font-size: 14px;
+    font-weight: bold;
     white-space: nowrap;
 }
 .sidebar-nav > ul > li {
@@ -768,6 +769,12 @@ a#main-menu-act i:hover {
     margin: 0;
     padding: 0;
 }
+
+.sidebar-nav > ul > li > ul {
+    margin-left: 10px;
+    font-weight: normal;
+}
+
 .nav.main-menu > li > a,
 .nav.main-menu > li > ul > li > a,
 .nav.main-menu > li > ul > li > ul > li > a,
@@ -821,7 +828,7 @@ a#main-menu-act i:hover {
 }
 .nav.main-menu > li > a > i,
 .nav.main-menu > li > ul > li > a > i {
-    margin-right: 10px;
+    /*margin-right: 10px;*/
     height: 38px;
     width: 40px;
     padding: 13px 0px;
