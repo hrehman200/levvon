@@ -21,8 +21,8 @@
                 name: '<?=lang('sold');?>',
                 data: [<?php
                 foreach ($m2bs as $r) {
-                    if($r->quantity > 0) {
-                        echo "['".$r->product_name."<br>(".$r->product_code.")', ".$r->quantity."],";
+                    if($r->subtotal > 0) {
+                        echo "['".$r->product_name."<br>(".$r->product_code.")', ".$r->subtotal."],";
                     }
                 }
                 ?>],
@@ -48,8 +48,8 @@
                 name: '<?=lang('sold');?>',
                 data: [<?php
             foreach ($m1bs as $r) {
-                if($r->quantity > 0) {
-                    echo "['".$r->product_name."<br>(".$r->product_code.")', ".$r->quantity."],";
+                if($r->subtotal > 0) {
+                    echo "['".$r->product_name."<br>(".$r->product_code.")', ".$r->subtotal."],";
                 }
             }
             ?>],
@@ -75,8 +75,8 @@
                 name: '<?=lang('sold');?>',
                 data: [<?php
             foreach ($m3bs as $r) {
-                if($r->quantity > 0) {
-                    echo "['".$r->product_name."<br>(".$r->product_code.")', ".$r->quantity."],";
+                if($r->subtotal > 0) {
+                    echo "['".$r->product_name."<br>(".$r->product_code.")', ".$r->subtotal."],";
                 }
             }
             ?>],
@@ -102,8 +102,8 @@
                 name: '<?=lang('sold');?>',
                 data: [<?php
             foreach ($m4bs as $r) {
-                if($r->quantity > 0) {
-                    echo "['".$r->product_name."<br>(".$r->product_code.")', ".$r->quantity."],";
+                if($r->subtotal > 0) {
+                    echo "['".$r->product_name."<br>(".$r->product_code.")', ".$r->subtotal."],";
                 }
             }
             ?>],

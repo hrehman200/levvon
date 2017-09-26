@@ -594,10 +594,10 @@ class Reports_model extends CI_Model
     public function getBestSeller($start_date, $end_date, $warehouse_id = NULL)
     {
         $this->db
-            ->select("product_name, product_code")->select_sum('quantity')
+            ->select("product_name, product_code")->select_sum('subtotal')
             ->join('sales', 'sales.id = sale_items.sale_id', 'left')
             ->where('date >=', $start_date)->where('date <=', $end_date)
-            ->group_by('product_name, product_code')->order_by('sum(quantity)', 'desc')->limit(10);
+            ->group_by('product_name, product_code')->order_by('sum(subtotal)', 'desc')->limit(10);
         if ($warehouse_id) {
             $this->db->where('sale_items.warehouse_id', $warehouse_id);
         }

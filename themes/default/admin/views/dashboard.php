@@ -660,8 +660,8 @@ function row_status($x)
                     name: '<?=lang('sold');?>',
                     data: [<?php
                     foreach ($lmbs as $r) {
-                        if($r->quantity > 0) {
-                            echo "['".$r->product_name."<br>(".$r->product_code.")', ".$r->quantity."],";
+                        if($r->subtotal > 0) {
+                            echo "['".$r->product_name."<br>(".$r->product_code.")', ".$r->subtotal."],";
                         }
                     }
                     ?>],
@@ -687,8 +687,8 @@ function row_status($x)
                     name: '<?=lang('sold');?>',
                     data: [<?php
                 foreach ($bs as $r) {
-                    if($r->quantity > 0) {
-                        echo "['".$r->product_name."<br>(".$r->product_code.")', ".$r->quantity."],";
+                    if($r->subtotal > 0) {
+                        echo "['".$r->product_name."<br>(".$r->product_code.")', ".$r->subtotal."],";
                     }
                 }
                 ?>],

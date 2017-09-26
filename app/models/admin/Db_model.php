@@ -150,13 +150,13 @@ class Db_model extends CI_Model
 
         $this->db
             ->select("product_name, product_code")
-            ->select_sum('quantity')
+            ->select_sum('subtotal')
             ->from('sale_items')
             ->join('sales', 'sales.id = sale_items.sale_id', 'left')
             ->where('date >=', $start_date)
             ->where('date <', $end_date)
             ->group_by('product_name, product_code')
-            ->order_by('sum(quantity)', 'desc')
+            ->order_by('sum(subtotal)', 'desc')
             ->limit(10);
         $q = $this->db->get();
         if ($q->num_rows() > 0) {

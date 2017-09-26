@@ -249,30 +249,34 @@ class Reports extends MY_Controller
     public function best_sellers($warehouse_id = NULL)
     {
         $this->sma->checkPermissions('products');
-
         $this->data['error'] = (validation_errors() ? validation_errors() : $this->session->flashdata('error'));
+
         $y1 = date('Y', strtotime('-1 month'));
         $m1 = date('m', strtotime('-1 month'));
         $m1sdate = $y1.'-'.$m1.'-01 00:00:00';
         $m1edate = $y1.'-'.$m1.'-'. days_in_month($m1, $y1) . ' 23:59:59';
         $this->data['m1'] = date('M Y', strtotime($y1.'-'.$m1));
         $this->data['m1bs'] = $this->reports_model->getBestSeller($m1sdate, $m1edate, $warehouse_id);
+
         $y2 = date('Y', strtotime('-2 months'));
         $m2 = date('m', strtotime('-2 months'));
         $m2sdate = $y2.'-'.$m2.'-01 00:00:00';
         $m2edate = $y2.'-'.$m2.'-'. days_in_month($m2, $y2) . ' 23:59:59';
         $this->data['m2'] = date('M Y', strtotime($y2.'-'.$m2));
         $this->data['m2bs'] = $this->reports_model->getBestSeller($m2sdate, $m2edate, $warehouse_id);
+
         $y3 = date('Y', strtotime('-3 months'));
         $m3 = date('m', strtotime('-3 months'));
         $m3sdate = $y3.'-'.$m3.'-01 23:59:59';
         $this->data['m3'] = date('M Y', strtotime($y3.'-'.$m3)).' - '.$this->data['m1'];
         $this->data['m3bs'] = $this->reports_model->getBestSeller($m3sdate, $m1edate, $warehouse_id);
+
         $y4 = date('Y', strtotime('-12 months'));
         $m4 = date('m', strtotime('-12 months'));
         $m4sdate = $y4.'-'.$m4.'-01 23:59:59';
         $this->data['m4'] = date('M Y', strtotime($y4.'-'.$m4)).' - '.$this->data['m1'];
         $this->data['m4bs'] = $this->reports_model->getBestSeller($m4sdate, $m1edate, $warehouse_id);
+
         // $this->sma->print_arrays($this->data['m1bs'], $this->data['m2bs'], $this->data['m3bs'], $this->data['m4bs']);
         $this->data['warehouses'] = $this->site->getAllWarehouses();
         $this->data['warehouse'] = $warehouse_id ? $this->site->getWarehouseByID($warehouse_id) : NULL;
