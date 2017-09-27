@@ -75,4 +75,5 @@ $(document).ready(function(e) {
 $(function() {
     $('.datetime').datetimepicker({format: site.dateFormats.js_ldate, language: 'sma', weekStart: 1, todayBtn: 1, autoclose: 1, todayHighlight: 1, startView: 2, forceParse: 0});
     $('.date').datetimepicker({format: site.dateFormats.js_sdate, language: 'sma', todayBtn: 1, autoclose: 1, minView: 2 });
+    $('.time').datetimepicker({pickDate:false, format: 'HH:ii:00', language: 'sma', todayBtn: 0, autoclose: 1, minView: 0, maxView:1, startView:1 });
 });

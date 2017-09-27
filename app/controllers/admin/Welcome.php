@@ -18,6 +18,7 @@ class Welcome extends MY_Controller
 
         $this->load->library('form_validation');
         $this->load->admin_model('db_model');
+        $this->load->admin_model('daily_schedule_model');
     }
 
     public function index()
@@ -37,6 +38,10 @@ class Welcome extends MY_Controller
         $this->data['chatData'] = $this->db_model->getChartData();
         $this->data['stock'] = $this->db_model->getStockValue();
         $this->data['bs'] = $this->db_model->getBestSeller();
+
+        $user_id = $this->session->userdata('user_id');
+        $this->data['daily_schedule'] = $this->daily_schedule_model->get($user_id, 0, date('Y-m-d'));
+
         $lmsdate = date('Y-m-d', strtotime('first day of last month')) . ' 00:00:00';
         $lmedate = date('Y-m-d', strtotime('last day of last month')) . ' 23:59:59';
         $this->data['lmbs'] = $this->db_model->getBestSeller($lmsdate, $lmedate);

@@ -739,4 +739,19 @@ function row_status($x)
             </div>
         </div>
     </div>
-<?php } ?>
+<?php }
+
+if(count($daily_schedule) > 0) {
+    ?>
+    <script type="text/javascript">
+        var href = '<?= admin_url('daily_schedule/readonlyModal/'.date('Y-m-d'))?>';
+        $.get(href, function( data ) {
+            $("#myModal").html(data).modal();
+        });
+    </script>
+<?php
+}
+
+?>
+
+

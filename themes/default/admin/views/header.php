@@ -759,6 +759,11 @@
                                             <i class="fa fa-calendar"></i><span class="text"> <?= lang('daily_purchases'); ?></span>
                                         </a>
                                     </li>
+                                    <li id="reports-daily-schedule">
+                                        <a href="<?= admin_url('reports/daily_schedule') ?>">
+                                            <i class="fa fa-calendar"></i><span class="text"> DAILY SCHEDULE</span>
+                                        </a>
+                                    </li>
                                     <li id="reports_monthly_purchases">
                                         <a href="<?= admin_url('reports/monthly_purchases') ?>">
                                             <i class="fa fa-calendar"></i><span class="text"> <?= lang('monthly_purchases'); ?></span>
