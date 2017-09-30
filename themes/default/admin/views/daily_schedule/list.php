@@ -6,7 +6,7 @@
                 <i class="fa fa-2x">&times;</i>
             </button>
             <h4 class="modal-title"
-                id="myModalLabel"><?= $user->first_name.' '.$user->last_name; ?></h4>
+                id="myModalLabel"><?= $user->first_name.' '.$user->last_name; ?> schedule for <?=$date?></h4>
         </div>
         <div class="modal-body">
             <div class="table-responsive">

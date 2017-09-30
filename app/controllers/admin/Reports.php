@@ -3011,8 +3011,8 @@ class Reports extends MY_Controller
         $this->data['year'] = $year;
         $this->data['month'] = $month;
 
-        $bc = array(array('link' => base_url(), 'page' => lang('home')), array('link' => admin_url('reports'), 'page' => lang('reports')), array('link' => '#', 'page' => lang('daily_sales_report')));
-        $meta = array('page_title' => lang('daily_sales_report'), 'bc' => $bc);
+        $bc = array(array('link' => base_url(), 'page' => lang('home')), array('link' => admin_url('reports'), 'page' => lang('reports')), array('link' => '#', 'page' => 'Daily Schedule'));
+        $meta = array('page_title' => 'Daily Schedule', 'bc' => $bc);
         $this->page_construct('daily_schedule/calendar', $meta, $this->data);
 
     }

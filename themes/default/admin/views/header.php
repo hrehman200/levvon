@@ -761,7 +761,7 @@
                                     </li>
                                     <li id="reports-daily-schedule">
                                         <a href="<?= admin_url('reports/daily_schedule') ?>">
-                                            <i class="fa fa-calendar"></i><span class="text"> DAILY SCHEDULE</span>
+                                            <i class="fa fa-calendar"></i><span class="text"> Daily Schedule</span>
                                         </a>
                                     </li>
                                     <li id="reports_monthly_purchases">
