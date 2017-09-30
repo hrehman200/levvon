@@ -48,7 +48,7 @@ class Customers extends MY_Controller
             </a> <a class=\"tip\" title='" . lang("list_addresses") . "' href='" . admin_url('customers/addresses/$1') . "' data-toggle='modal' data-target='#myModal'>
                 <i class=\"fa fa-location-arrow\"></i>
             </a>
-            </a> <a class=\"tip\" title='" . lang("list_notes") . "' href='" . admin_url('customers/notes/$1/customers') . "' data-toggle='modal' data-target='#myModal'>
+            </a> <a class=\"tip list-notes\" data-company-id='$1' title='" . lang("list_notes") . "' href='" . admin_url('customers/notes/$1/customers') . "' data-toggle='modal' data-target='#myModal'>
                 <i class=\"fa fa-newspaper-o\"></i>
             </a>
             <a class=\"tip\" title='" . lang("list_users") . "' href='" . admin_url('customers/users/$1') . "' data-toggle='modal' data-target='#myModal'>
@@ -737,6 +737,7 @@ class Customers extends MY_Controller
             $note = $this->companies_model->getNoteByID($note_id);
         }
         $company = $this->companies_model->getCompanyByID($company_id);
+        $user_id = $this->session->userdata('user_id');
         
         $this->form_validation->set_rules('title', lang("title"), 'required');
         $this->form_validation->set_rules('note', lang("note"), 'required');
@@ -752,7 +753,7 @@ class Customers extends MY_Controller
                 );
 
                 if($note_id == null) {
-                    $success = $this->companies_model->addNote($data);
+                    $success = $this->companies_model->addNote($data, $user_id);
                 } else {
                     $success = $this->companies_model->updateNote($note_id, $data);
                 }
@@ -820,6 +821,32 @@ class Customers extends MY_Controller
         $this->data['customer'] = $this->companies_model->getCompanyByID($company_id);
         $this->data['page'] = $page;
         $this->load->view($this->theme . 'customers/notes/view', $this->data);
+    }
+
+    /**
+     * @param $company_id
+     */
+    function getUnreadCompanyNoteCount() {
+        $this->sma->checkPermissions(false, true);
+        $this->load->admin_model('company_notes_readby_model');
+
+        $company_ids = $this->input->get('company_ids[]');
+        $user_id = $this->session->userdata('user_id');
+        $response = $this->company_notes_readby_model->getUnreadCompanyNotesCount($company_ids, $user_id);
+        echo json_encode($response);
+    }
+
+    /**
+     * @param $company_id
+     */
+    function markNotesAsRead() {
+        $this->sma->checkPermissions(false, true);
+        $this->load->admin_model('company_notes_readby_model');
+
+        $note_ids = $this->input->get('note_ids[]');
+        $user_id = $this->session->userdata('user_id');
+        $this->company_notes_readby_model->markNotesAsRead($note_ids, $user_id);
+        echo json_encode(true);
     }
 
     // **************************************** CUSTOMER NOTES] ****************************************/

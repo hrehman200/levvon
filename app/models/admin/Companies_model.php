@@ -306,15 +306,26 @@ class Companies_model extends CI_Model
     // **************************************** [CUSTOMER NOTES ****************************************/
     /**
      * @param $data
+     * @param $user_id
      * @return mixed
      */
-    public function addNote($data) {
+    public function addNote($data, $user_id) {
 
         $data['isDeleted'] = 0;
         $data['created'] = date('Y-m-d H:i:s');
         $data['modified'] = date('Y-m-d H:i:s');
 
-        return $this->db->insert('company_notes', $data);
+        $success = $this->db->insert('company_notes', $data);
+
+        $note_id = $this->db->insert_id();
+
+        $this->load->admin_model('company_notes_readby_model');
+        $this->company_notes_readby_model->add(array(
+            'user_id' => $user_id,
+            'note_id' => $note_id
+        ));
+
+        return $success;
     }
 
     /**
@@ -358,7 +369,7 @@ class Companies_model extends CI_Model
             ->where('companyId', $customer_id)
             ->where('isDeleted', 0)
             ->add_column("Actions", "<div class=\"text-center\">
-                <a class=\"tip\" title='" . lang("edit_note") . "' href='" . admin_url('customers/edit_note/'.$customer_id.'/'.$page.'/$1') . "' data-toggle='modal' data-target='#myModal2'>
+                <a class=\"tip edit-note\" title='" . lang("edit_note") . "' data-id='$1' href='" . admin_url('customers/edit_note/'.$customer_id.'/'.$page.'/$1') . "' data-toggle='modal' data-target='#myModal2'>
                     <i class=\"fa fa-edit\"></i>
                 </a>
                 <a href='#' class='tip po' title='<b>" . lang("delete_note") . "</b>' data-content=\"<p>" . lang('r_u_sure') . "</p>

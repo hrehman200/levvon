@@ -19,6 +19,9 @@
                 nRow.className = "customer_details_link";
                 return nRow;
             },
+            'fnDrawCallback': function() {
+                getUnreadCompanyNoteCount();
+            },
             "aoColumns": [{
                 "bSortable": false,
                 "mRender": checkbox
@@ -139,5 +142,37 @@
     echo '<script>$(document).ready(function(){$("#add").trigger("click");});</script>';
 }
 ?>
+
+<script type="text/javascript">
+    function getUnreadCompanyNoteCount() {
+
+        var companyIds = $('.list-notes').map(function() {
+            return $(this).data("company-id");
+        }).get();
+
+        $.ajax({
+            type: 'get',
+            url: '<?= admin_url('customers/getUnreadCompanyNoteCount/'); ?>',
+            dataType: "json",
+            data: {
+                company_ids: companyIds
+            },
+            success: function (response) {
+                for(var i=0; i<response.data.length; i++) {
+                    if(response.data[i].unread > 0) {
+                        $('a[data-company-id="' + response.data[i].company_id + '"]')
+                            .parents('tr:eq(0)').find('td').css({
+                            'backgroundColor': 'lightgreen',
+                            'fontWeight': 'bold'
+                        }).end().end();
+                    }
+                }
+
+
+            }
+        });
+    }
+    getUnreadCompanyNoteCount();
+</script>
 	
 

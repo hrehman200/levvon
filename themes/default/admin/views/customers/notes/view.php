@@ -27,6 +27,9 @@
                                 nRow.className = 'customer_notes_link';
                                 return nRow;
                             },
+                            'fnDrawCallback':function() {
+                                markNotesRead();
+                            },
                             'fnServerData': function (sSource, aoData, fnCallback) {
                                 aoData.push({
                                     "name": "<?= $this->security->get_csrf_token_name() ?>",
@@ -107,3 +110,23 @@
         </div>
     </div>
 </div>
+
+<script type="text/javascript">
+    function markNotesRead() {
+        var noteIds = $('.edit-note').map(function() {
+            return $(this).data("id");
+        }).get();
+
+        $.ajax({
+            type: 'get',
+            url: '<?= admin_url('customers/markNotesAsRead'); ?>',
+            dataType: "json",
+            data: {
+                "note_ids[]": noteIds
+            },
+            success: function (response) {
+                getUnreadCompanyNoteCount();
+            }
+        });
+    }
+</script>
