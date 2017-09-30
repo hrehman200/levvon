@@ -48,7 +48,7 @@ class Daily_schedule_model extends CI_Model {
         $this->datatables->select('id, date, time, note')
             ->from('daily_schedule')
             ->where('user_id', $user_id)
-            ->where('is_read', 0)
+            //->where('is_read', $is_read)
             ->where('date', $date)
             ->add_column("Actions", "<div class=\"text-center\">
                 <a class=\"tip\" title='" . lang("edit_note") . "' href='" . admin_url('daily_schedule/edit/$1/$2') . "' data-toggle='modal' data-target='#myModal2'>

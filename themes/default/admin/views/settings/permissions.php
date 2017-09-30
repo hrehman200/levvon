@@ -274,6 +274,10 @@
                                             <label for="daily_sales" class="padding05"><?= lang('daily_sales') ?></label>
                                         </span>
                                         <span style="inline-block">
+                                            <input type="checkbox" value="1" class="checkbox" id="daily_schedule" name="reports-daily-schedule" <?php echo $p->{'reports-daily-schedule'} ? "checked" : ''; ?>>
+                                            <label for="daily_schedule" class="padding05">Daily Schedule</label>
+                                        </span>
+                                        <span style="inline-block">
                                             <input type="checkbox" value="1" class="checkbox" id="monthly_sales" name="reports-monthly_sales" <?php echo $p->{'reports-monthly_sales'} ? "checked" : ''; ?>>
                                             <label for="monthly_sales" class="padding05"><?= lang('monthly_sales') ?></label>
                                         </span>

@@ -794,6 +794,7 @@ class system_settings extends MY_Controller
                 'reports-monthly_purchases' => $this->input->post('reports-monthly_purchases'),
                 'products-stock_count' => $this->input->post('products-stock_count'),
                 'edit_price' => $this->input->post('edit_price'),
+                'reports-daily-schedule' => $this->input->post('reports-daily-schedule'),
             );
 
             if (POS) {
