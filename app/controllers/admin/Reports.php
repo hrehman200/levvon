@@ -2946,7 +2946,7 @@ class Reports extends MY_Controller
         }
         if (!$month) {
             $month = date('m');
-            $date = date('d');
+            $date = date('j');
         } else {
             $date = '';
         }
@@ -2997,10 +2997,10 @@ class Reports extends MY_Controller
                     <tr><td>" . $event['note'] . "</td></tr>
                 </table><br/>";
 
-                if(isset($daily_events[date('d', strtotime($event['date']))])) {
-                    $daily_events[date('d', strtotime($event['date']))] .= $str;
+                if(isset($daily_events[date('j', strtotime($event['date']))])) {
+                    $daily_events[date('j', strtotime($event['date']))] .= $str;
                 } else {
-                    $daily_events[date('d', strtotime($event['date']))] = $str;
+                    $daily_events[date('j', strtotime($event['date']))] = $str;
                 }
             }
         } else {

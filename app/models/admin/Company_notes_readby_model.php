@@ -55,17 +55,20 @@ class Company_notes_readby_model extends CI_Model {
         foreach($total_result as $total_row) {
             $company_id = $total_row['companyId'];
 
-            $read_row = array_filter($read_result, function($read_row) use ($company_id) {
+            $row_find = array_filter($read_result, function($read_row) use ($company_id) {
                 return $company_id == $read_row['companyId'];
             });
 
             $read = 0;
-            if(count($read_row) > 0 && count($read_row[0]) > 0) {
-                $read = $read_row[0]['a'];
+            if(count($row_find) > 0) {
+                $row_reset = array_values($row_find);
+                $read = $row_reset[0]['a'];
             }
 
-            $arr[] = array('company_id'=>$company_id,
-                           'unread'=>$total_row['a'] - $read);
+            $arr[] = array(
+                'company_id'=>$company_id,
+                'unread'=>($total_row['a'] - $read)
+            );
         }
 
         return array('data'=>$arr);
