@@ -26,7 +26,7 @@ class Daily_schedule extends MY_Controller {
      * @param $date
      */
     function modal($date) {
-        $this->sma->checkPermissions('users', true);
+        $this->sma->checkPermissions('daily-schedule', true, 'reports');
 
         $user_id = $this->session->userdata('user_id');
         $this->data['user'] = $this->ion_auth->user($user_id)->row();
@@ -54,7 +54,7 @@ class Daily_schedule extends MY_Controller {
     }
 
     function getList($date) {
-        $this->sma->checkPermissions('users', TRUE);
+        $this->sma->checkPermissions('daily-schedule', true, 'reports');
         $this->load->library('datatables');
 
         $user_id = $this->session->userdata('user_id');
@@ -64,7 +64,7 @@ class Daily_schedule extends MY_Controller {
     }
 
     function edit($date, $schedule_id = NULL) {
-        $this->sma->checkPermissions('users', true);
+        $this->sma->checkPermissions('daily-schedule', true, 'reports');
 
         if($schedule_id != null) {
             $schedule = $this->daily_schedule_model->getById($schedule_id);
@@ -118,7 +118,7 @@ class Daily_schedule extends MY_Controller {
      * @param $id
      */
     function delete($id) {
-        $this->sma->checkPermissions('users', true);
+        $this->sma->checkPermissions('daily-schedule', true, 'reports');
 
         if ($this->daily_schedule_model->delete($id)) {
             $this->sma->send_json(array('error' => 0, 'msg' => lang("schedule_deleted")));

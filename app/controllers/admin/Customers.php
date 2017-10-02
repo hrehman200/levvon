@@ -731,7 +731,7 @@ class Customers extends MY_Controller
      * @param null $note_id
      */
     function edit_note($company_id, $page = 'customers', $note_id = NULL) {
-        $this->sma->checkPermissions('index', true);
+        $this->sma->checkPermissions('customers', true, 'reports');
 
         if($note_id != null) {
             $note = $this->companies_model->getNoteByID($note_id);
@@ -789,7 +789,7 @@ class Customers extends MY_Controller
      */
     public function delete_note($id)
     {
-        $this->sma->checkPermissions(NULL, TRUE);
+        $this->sma->checkPermissions('customers', true, 'reports');
 
         if ($this->companies_model->deleteNote($id)) {
             $this->sma->send_json(array('error' => 0, 'msg' => lang("note_deleted")));
@@ -800,7 +800,7 @@ class Customers extends MY_Controller
      * @param $customer_id
      */
     function get_notes($customer_id, $page) {
-        $this->sma->checkPermissions('sales', TRUE);
+        $this->sma->checkPermissions('customers', true, 'reports');
 
         $this->load->library('datatables');
         $this->load->admin_model('companies_model');
@@ -814,7 +814,7 @@ class Customers extends MY_Controller
      * @param $page
      */
     function notes($company_id, $page) {
-        $this->sma->checkPermissions(false, true);
+        $this->sma->checkPermissions('customers', true, 'reports');
 
         $this->data['error'] = (validation_errors() ? validation_errors() : $this->session->flashdata('error'));
         $this->data['modal_js'] = $this->site->modal_js();
@@ -827,7 +827,7 @@ class Customers extends MY_Controller
      * @param $company_id
      */
     function getUnreadCompanyNoteCount() {
-        $this->sma->checkPermissions(false, true);
+        $this->sma->checkPermissions('customers', true, 'reports');
         $this->load->admin_model('company_notes_readby_model');
 
         $company_ids = $this->input->get('company_ids[]');
@@ -840,7 +840,7 @@ class Customers extends MY_Controller
      * @param $company_id
      */
     function markNotesAsRead() {
-        $this->sma->checkPermissions(false, true);
+        $this->sma->checkPermissions('customers', true, 'reports');
         $this->load->admin_model('company_notes_readby_model');
 
         $note_ids = $this->input->get('note_ids[]');
