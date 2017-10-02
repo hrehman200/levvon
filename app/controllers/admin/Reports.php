@@ -2938,9 +2938,9 @@ class Reports extends MY_Controller
         echo json_encode($response);
     }
 
-    function daily_schedule($year = NULL, $month = NULL)
-    {
-        $this->sma->checkPermissions();
+    function daily_schedule($year = NULL, $month = NULL) {
+        $this->sma->checkPermissions('daily-schedule', true, 'reports');
+
         if (!$year) {
             $year = date('Y');
         }

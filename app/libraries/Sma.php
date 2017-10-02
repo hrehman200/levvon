@@ -302,8 +302,8 @@ class Sma
             if (!$action) {
                 $action = $this->v;
             }
-            //$gp = $this->site->checkPermissions();
-            if ($this->GP[$module . '-' . $action] == 1) {
+            $gp = $this->site->checkPermissions();
+            if ($gp[0][$module . '-' . $action] == 1) {
                 return true;
             } else {
                 return false;

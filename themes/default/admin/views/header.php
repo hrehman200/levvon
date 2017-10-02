@@ -1146,6 +1146,13 @@
                                         </a>
                                     </li>
                                     <?php }
+                                    if ($GP['reports-daily-schedule']) { ?>
+                                    <li id="reports-daily-schedule">
+                                        <a href="<?= admin_url('reports/daily_schedule') ?>">
+                                            <i class="fa fa-calendar"></i><span class="text"> Daily Schedule</span>
+                                        </a>
+                                    </li>
+                                    <?php }
                                     if ($GP['reports-monthly_purchases']) { ?>
                                     <li id="reports_monthly_purchases">
                                         <a href="<?= admin_url('reports/monthly_purchases') ?>">
