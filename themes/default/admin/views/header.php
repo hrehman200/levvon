@@ -540,6 +540,11 @@
                                         </a>
                                     </li>
                                     <li id="customers_index">
+                                        <a class="submenu" href="<?= admin_url('customers/forecast'); ?>">
+                                            <i class="fa fa-users"></i><span class="text">Forecast Customers</span>
+                                        </a>
+                                    </li>
+                                    <li id="customers_index">
                                         <a class="submenu" href="<?= admin_url('customers/add'); ?>" data-toggle="modal" data-target="#myModal">
                                             <i class="fa fa-plus-circle"></i><span class="text"> <?= lang('add_customer'); ?></span>
                                         </a>
@@ -1037,6 +1042,11 @@
                                     <li id="customers_index">
                                         <a class="submenu" href="<?= admin_url('customers'); ?>">
                                             <i class="fa fa-users"></i><span class="text"> <?= lang('list_customers'); ?></span>
+                                        </a>
+                                    </li>
+                                    <li id="customers_index">
+                                        <a class="submenu" href="<?= admin_url('customers/forecast'); ?>">
+                                            <i class="fa fa-users"></i><span class="text">Forecast Customers</span>
                                         </a>
                                     </li>
                                     <?php }

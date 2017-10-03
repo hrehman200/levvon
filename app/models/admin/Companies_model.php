@@ -303,6 +303,50 @@ class Companies_model extends CI_Model
         return FALSE;
     }
 
+    public function getForecast() {
+        $this->load->admin_model('reports_model');
+        $this->load->library('datatables');
+        $this->datatables
+            ->select("id, company, name, phone, 0 AS average_product, 0 AS average_buying_days, 0 AS days_inactive")
+            ->from("companies")
+            ->where('group_name', 'customer')
+            ->add_column("Actions", "<div class=\"text-center\">
+            <a class=\"tip\" title='" . lang("list_deposits") . "' href='" . admin_url('customers/deposits/$1') . "' data-toggle='modal' data-target='#myModal'>
+                <i class=\"fa fa-money\"></i>
+            </a>
+            <a class=\"tip\" title='" . lang("add_deposit") . "' href='" . admin_url('customers/add_deposit/$1') . "' data-toggle='modal' data-target='#myModal'>
+                <i class=\"fa fa-plus\"></i>
+            </a> <a class=\"tip\" title='" . lang("list_addresses") . "' href='" . admin_url('customers/addresses/$1') . "' data-toggle='modal' data-target='#myModal'>
+                <i class=\"fa fa-location-arrow\"></i>
+            </a>
+            </a> <a class=\"tip list-notes\" data-company-id='$1' title='" . lang("list_notes") . "' href='" . admin_url('customers/notes/$1/customers') . "' data-toggle='modal' data-target='#myModal'>
+                <i class=\"fa fa-newspaper-o\"></i>
+            </a>
+            <a class=\"tip\" title='" . lang("list_users") . "' href='" . admin_url('customers/users/$1') . "' data-toggle='modal' data-target='#myModal'>
+                <i class=\"fa fa-users\"></i></a> <a class=\"tip\" title='" . lang("add_user") . "' href='" . admin_url('customers/add_user/$1') . "' data-toggle='modal' data-target='#myModal'><i class=\"fa fa-user-plus\"></i>
+            </a>
+            <a class=\"tip\" title='" . lang("edit_customer") . "' href='" . admin_url('customers/edit/$1') . "' data-toggle='modal' data-target='#myModal'>
+                <i class=\"fa fa-edit\"></i>
+            </a>
+            <a href='#' class='tip po' title='<b>" . lang("delete_customer") . "</b>' data-content=\"<p>" . lang('r_u_sure') . "</p><a class='btn btn-danger po-delete' href='" . admin_url('customers/delete/$1') . "'>" . lang('i_m_sure') . "</a> <button class='btn po-close'>" . lang('no') . "</button>\"  rel='popover'>
+                <i class=\"fa fa-trash-o\"></i>
+            </a>
+        </div>", "id");
+        //->unset_column('id');
+
+        $json = $this->datatables->generate();
+        $arr = json_decode($json, true);
+
+        foreach($arr['aaData'] as &$row) {
+            $avg_data = $this->reports_model->getAverageReportForCustomer($row[0]);
+            $row[4] = $avg_data['avg_buying_date'];
+            $row[5] = $avg_data['avg_product_name'];
+            $row[6] = $avg_data['days_inactive'];
+        }
+
+        return json_encode($arr);
+    }
+
     // **************************************** [CUSTOMER NOTES ****************************************/
     /**
      * @param $data

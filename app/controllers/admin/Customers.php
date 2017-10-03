@@ -723,6 +723,21 @@ class Customers extends MY_Controller
         }
     }
 
+    public function forecast() {
+        $this->sma->checkPermissions('index', true);
+
+        $this->data['error'] = (validation_errors()) ? validation_errors() : $this->session->flashdata('error');
+        $bc = array(array('link' => base_url(), 'page' => lang('home')), array('link' => '#', 'page' => 'Customers Forecast'));
+        $meta = array('page_title' => 'Customers Forecast', 'bc' => $bc);
+        $this->page_construct('customers/forecast', $meta, $this->data);
+    }
+
+    public function getCustomersForecast() {
+        $this->sma->checkPermissions('index');
+        $this->load->admin_model('companies_model');
+        $response = $this->companies_model->getForecast();
+        echo $response;
+    }
 
     // **************************************** [CUSTOMER NOTES ****************************************/
 

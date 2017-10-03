@@ -993,7 +993,7 @@
                         company_ids: [<?=$user_id?>]
                     },
                     success: function (response) {
-                        var unread = response.data[<?=$user_id?>];
+                        var unread = response.data[0]['unread'];
                         if (unread > 0) {
                             $('.spUnreadNoteCount').show().html(unread);
                         } else {
