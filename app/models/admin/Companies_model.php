@@ -303,6 +303,19 @@ class Companies_model extends CI_Model
         return FALSE;
     }
 
+    /**
+     * @param $a
+     * @param $b
+     * @return bool
+     */
+    private static function sortCustomValues($a, $b) {
+        if($_POST['sSortDir_0'] == 'asc') {
+            return $a[$_POST['iSortCol_0']]>$b[$_POST['iSortCol_0']];
+        } else {
+            return $a[$_POST['iSortCol_0']]<$b[$_POST['iSortCol_0']];
+        }
+    }
+
     public function getForecast() {
         $this->load->admin_model('reports_model');
         $this->load->library('datatables');
@@ -342,6 +355,14 @@ class Companies_model extends CI_Model
             $row[4] = $avg_data['avg_buying_date'];
             $row[5] = $avg_data['avg_product_name'];
             $row[6] = $avg_data['days_inactive'];
+        }
+
+        switch($_POST['iSortCol_0']) {
+            case 4:
+            case 5:
+            case 6:
+            usort($arr['aaData'], "self::sortCustomValues");
+                break;
         }
 
         return json_encode($arr);
@@ -420,9 +441,24 @@ class Companies_model extends CI_Model
                     <a class='btn btn-danger po-delete' href='" . admin_url('customers/delete_note/$1') . "'>" . lang('i_m_sure') . "</a>
                     <button class='btn po-close'>" . lang('no') . "</button>\"  rel='popover'><i class=\"fa fa-trash-o\"></i>
                 </a>
-            </div>", "id")
-            ->unset_column('id');
-        return $this->datatables->generate();
+            </div>", "id");
+
+        $json = $this->datatables->generate();
+        $arr = json_decode($json, true);
+
+        foreach($arr['aaData'] as &$row) {
+            $user_row = $this->db->select('CONCAT(u.first_name, " ", u.last_name) AS userName', false)
+                ->from('company_notes_readby cnrb')
+                ->join('users u', 'cnrb.user_id = u.id', 'INNER')
+                ->order_by('cnrb.modified', 'ASC')
+                ->where('cnrb.note_id', $row[0])
+                ->limit(1)
+                ->get()->row();
+
+            $row[1] .= '<br/>'.$user_row->userName;
+        }
+
+        echo json_encode($arr);
     }
 
     /**

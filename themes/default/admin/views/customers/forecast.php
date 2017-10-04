@@ -3,8 +3,9 @@
     $(document).ready(function () {
         var cTable = $('#CusData').dataTable({
             "aaSorting": [[1, "asc"]],
-            "aLengthMenu": [[10, 25, 50, 100, -1], [10, 25, 50, 100, "<?= lang('all') ?>"]],
-            "iDisplayLength": <?= $Settings->rows_per_page ?>,
+            "aLengthMenu": -1, // [[10, 25, 50, 100, -1], [10, 25, 50, 100, "<?= lang('all') ?>"]]
+            "bLengthChange": false,
+            "iDisplayLength": -1,
             'bProcessing': true, 'bServerSide': true,
             'sAjaxSource': '<?= admin_url('customers/getCustomersForecast') ?>',
             'fnServerData': function (sSource, aoData, fnCallback) {
@@ -25,13 +26,13 @@
             "aoColumns": [{
                 "bSortable": false,
                 "bVisible": false
-            }, null, null, null, null, null, null, null]
+            }, null, null, null, null, null, null, {bSortable:false, bSearchable:false}]
         }).dtFilter([
             {column_number: 1, filter_default_label: "[Company]", filter_type: "text", data: []},
             {column_number: 2, filter_default_label: "[Name]", filter_type: "text", data: []},
             {column_number: 3, filter_default_label: "[Phone]", filter_type: "text", data: []},
-            {column_number: 4, filter_default_label: "[Average Product Name]", filter_type: "text", data: []},
-            {column_number: 5, filter_default_label: "[Average Buying Days]", filter_type: "text", data: []},
+            {column_number: 4, filter_default_label: "[Avg. Buying Days]", filter_type: "text", data: []},
+            {column_number: 5, filter_default_label: "[Avg. Product Name]", filter_type: "text", data: []},
             {column_number: 6, filter_default_label: "[Days Inactive]", filter_type: "text", data: []},
         ], "footer");
         $('#myModal').on('hidden.bs.modal', function () {

@@ -838,17 +838,17 @@
                     },
                     "fnDrawCallback": function( settings ) {
 
-                    }
-                    //"aoColumns": [{"mRender": fld}, {"mRender": currencyFormat}, null, null, {"mRender": decode_html}]
+                    },
+                    "aoColumns": [{'bVisible':false}, null, null, null, {'bSortable':false}]
                 }).fnSetFilteringDelay().dtFilter([
                     {
-                        column_number: 0,
+                        column_number: 1,
                         filter_default_label: "[<?=lang('Created');?> (yyyy-mm-dd)]",
                         filter_type: "text",
                         data: []
                     },
-                    {column_number: 1, filter_default_label: "[<?=lang('Title');?>]", filter_type: "text", data: []},
-                    {column_number: 2, filter_default_label: "[<?=lang('Note');?>]", filter_type: "text", data: []},
+                    {column_number: 2, filter_default_label: "[<?=lang('Title');?>]", filter_type: "text", data: []},
+                    {column_number: 3, filter_default_label: "[<?=lang('Note');?>]", filter_type: "text", data: []},
                 ], "footer");
             });
         </script>
@@ -893,6 +893,7 @@
                                    class="table table-bordered table-condensed table-hover table-striped reports-table">
                                 <thead>
                                 <tr class="primary">
+                                    <th class="col-xs-1"></th>
                                     <th class="col-xs-2"><?= lang("created"); ?></th>
                                     <th class="col-xs-2"><?= lang("title"); ?></th>
                                     <th class="col-xs-7"><?= lang("note"); ?></th>
@@ -914,6 +915,7 @@
                                 </tbody>
                                 <tfoot>
                                 <tr class="dtFilter">
+                                    <th class="col-xs-1"></th>
                                     <th class="col-xs-2"></th>
                                     <th class="col-xs-2"></th>
                                     <th class="col-xs-7"></th>
