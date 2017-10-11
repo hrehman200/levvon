@@ -10,6 +10,13 @@
     <link href="<?= $assets ?>styles/style.css?v=<?=date('Y-m-d')?>" rel="stylesheet"/>
     <script type="text/javascript" src="<?= $assets ?>js/jquery-2.0.3.min.js"></script>
     <script type="text/javascript" src="<?= $assets ?>js/jquery-migrate-1.2.1.min.js"></script>
+
+    <link href="<?= $assets ?>chat/chat.css" rel="stylesheet" type="text/css" />
+    <link href="<?= $assets ?>chat/screen.css" rel="stylesheet" type="text/css" />
+    <?php
+    include_once __DIR__.'/chat.php';
+    ?>
+
     <!--[if lt IE 9]>
     <script src="<?= $assets ?>js/jquery.js"></script>
     <![endif]-->

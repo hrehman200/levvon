@@ -13,9 +13,12 @@ class Auth extends MY_Controller
         $this->load->library('ion_auth');
     }
 
+    function chat() {
+        $this->load->library('ci_chat');
+    }
+
     function index()
     {
-
         if (!$this->loggedIn) {
             admin_redirect('login');
         } else {
@@ -50,13 +53,21 @@ class Auth extends MY_Controller
 
         $this->load->library('datatables');
         $this->datatables
-            ->select($this->db->dbprefix('users').".id as id, first_name, last_name, email, company, award_points, " . $this->db->dbprefix('groups') . ".name, active")
+            ->select($this->db->dbprefix('users').".id as id, username, first_name, last_name, email, company, award_points, " . $this->db->dbprefix('groups') . ".name, active")
             ->from("users")
             ->join('groups', 'users.group_id=groups.id', 'left')
             ->group_by('users.id')
             ->where('company_id', NULL)
             ->edit_column('active', '$1__$2', 'active, id')
-            ->add_column("Actions", "<div class=\"text-center\"><a href='" . admin_url('auth/profile/$1') . "' class='tip' title='" . lang("edit_user") . "'><i class=\"fa fa-edit\"></i></a></div>", "id");
+            ->add_column("Actions", "<div class=\"text-center\">
+                <a href='" . admin_url('auth/profile/$1') . "' class='tip' title='" . lang("edit_user") . "'>
+                    <i class=\"fa fa-edit\"></i>
+                </a>
+                <a href='javascript:;' onclick=\"javascript:chatWith($1, '$2');\">
+                    <i class='fa fa-comments'></i>
+                </a>
+            </div>", "id, username")
+            ->unset_column('username');
 
         if (!$this->Owner) {
             $this->datatables->unset_column('id');
@@ -219,9 +230,16 @@ class Auth extends MY_Controller
                         admin_redirect('auth/logout/1');
                     }
                 }
+
+                if( !isset( $_SESSION['chatusername'] )  || !isset( $_SESSION['chatuserid'] )  ){
+                    $_SESSION['chatusername'] = $this->session->userdata('username');
+                    $_SESSION['chatuserid'] = $this->session->userdata('user_id');
+                }
+
                 $this->session->set_flashdata('message', $this->ion_auth->messages());
                 $referrer = ($this->session->userdata('requested_page') && $this->session->userdata('requested_page') != 'admin') ? $this->session->userdata('requested_page') : 'welcome';
                 admin_redirect($referrer);
+
             } else {
                 $this->session->set_flashdata('error', $this->ion_auth->errors());
                 admin_redirect('login');
