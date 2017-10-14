@@ -17,6 +17,11 @@ class Auth extends MY_Controller
         $this->load->library('ci_chat');
     }
 
+    function getOnlineUsers() {
+        $online_user_ids = $this->auth_model->getOnlineUsers();
+        echo json_encode($online_user_ids);
+    }
+
     function index()
     {
         if (!$this->loggedIn) {

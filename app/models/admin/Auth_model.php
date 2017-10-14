@@ -1525,5 +1525,18 @@ class Auth_model extends CI_Model
         }
     }
 
+    public function getOnlineUsers() {
 
+        $ci = &get_instance();
+        $where = sprintf('(last_login + %s > UNIX_TIMESTAMP())', $ci->config->item('sess_expiration'));
+
+        $result = $this->db->select('id')
+            ->where($where)
+            ->get('users')
+            ->result_array();
+
+        return array_map(function($val) {
+            return $val['id'];
+        }, $result);
+    }
 }

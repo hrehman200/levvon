@@ -216,6 +216,44 @@
                             </li>
                         </ul>
                     </li>
+                    <li class="dropdown hidden-xs" id="chatUsersList">
+                        <a class="btn tip" title="Users" data-placement="bottom" data-toggle="dropdown" href="#">
+                            <i class="fa fa-user"></i>
+                        </a>
+                        <ul class="dropdown-menu pull-right chat-users-list">
+                            <?php
+                            $users = $this->db->get_where('users', array('active' => 1))->result_array();
+                            foreach($users as $user) {
+                                ?>
+                                <li>
+                                    <a href="javascript:chatWith(<?=$user['id']?>, '<?=$user['username']?>')">
+                                        <i class="fa fa-circle" data-id="<?=$user['id']?>"></i>
+
+                                        <img alt="" src="<?= ($user['avatar']) ? base_url() . 'assets/uploads/avatars/thumbs/' . $user['avatar'] : base_url('assets/images/' . $user['gender'] . '.png'); ?>" class="mini_avatar img-rounded" style="width:50px; height:auto;">
+
+                                        <?=$user['first_name']." ".$user['last_name']?>
+                                    </a>
+                                </li>
+                                <?php
+                            }
+                            ?>
+                        </ul>
+                        <script type="text/javascript">
+                            $('#chatUsersList').on('show.bs.dropdown', function () {
+                                $.ajax({
+                                    url: "<?=admin_url('auth/getOnlineUsers')?>",
+                                    cache: false,
+                                    dataType: "json",
+                                    type:'GET',
+                                    success: function(data) {
+                                        for(var i in data) {
+                                            $('.chat-users-list .fa-circle[data-id="'+data[i]+'"]').css('color', 'lightseagreen');
+                                        }
+                                    }
+                                });
+                            });
+                        </script>
+                    </li>
                     <?php /* if ($Owner && $Settings->update) { ?>
                     <li class="dropdown hidden-sm">
                         <a class="btn blightOrange tip" title="<?= lang('update_available') ?>"
