@@ -90,6 +90,11 @@
     }
 
     function createChatBox(chatboxtitle,chatuserName, minimizeChatBox) {
+
+        if(chatuserName == undefined) {
+            return;
+        }
+
         if ($("#chatbox_"+chatboxtitle).length > 0) {
             if ($("#chatbox_"+chatboxtitle).css('display') == 'none') {
                 $("#chatbox_"+chatboxtitle).css('display','block');
