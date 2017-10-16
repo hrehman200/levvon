@@ -26,7 +26,7 @@
 	font-size: 13px;
 	color: #333333;
 	height:200px;
-	width:209px;
+	width:225px;
 	overflow-y:auto;
 	overflow-x:auto;
 	padding:7px;
@@ -61,6 +61,15 @@
 
 .chatboxmessage {
 	margin-left:1em;
+	word-wrap: break-word;
+}
+
+.txt-green {
+	color: green;
+}
+
+.txt-blue {
+	color: darkblue;
 }
 
 .chatboxinfo {

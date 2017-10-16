@@ -176,14 +176,20 @@
             success: function(data) {
 
                 $.each(data.items, function(i,item){
+
+                    var msgClass = '';
+
                     if (item)	{ // fix strange ie bug
+
+                        msgClass = item.f == 1 ? 'txt-green' : 'txt-blue';
+
                         if (item.s == 1) {
                             item.f = from_username;
                         }
                         if (item.s == 2) {
-                            $("#chatbox_"+chatboxtitle+" .chatboxcontent").append('<div class="chatboxmessage"><span class="chatboxinfo">'+item.m+'</span></div>');
+                            $("#chatbox_"+chatboxtitle+" .chatboxcontent").append('<div class="chatboxmessage '+msgClass+'"><span class="chatboxinfo">'+item.m+'</span></div>');
                         } else {
-                            $("#chatbox_"+chatboxtitle+" .chatboxcontent").append('<div class="chatboxmessage"><span class="chatboxmessagefrom">'+ getTitle( item.fname )+':&nbsp;&nbsp;</span><span class="chatboxmessagecontent">'+item.m+'</span></div>');
+                            $("#chatbox_"+chatboxtitle+" .chatboxcontent").append('<div class="chatboxmessage '+msgClass+'"><span class="chatboxmessagefrom">'+ getTitle( item.fname )+':&nbsp;&nbsp;</span><span class="chatboxmessagecontent">'+item.m+'</span></div>');
                         }
 
                         $("#chatbox_"+chatboxtitle+" .chatboxcontent").scrollTop($("#chatbox_"+chatboxtitle+" .chatboxcontent")[0].scrollHeight);
