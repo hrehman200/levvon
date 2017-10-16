@@ -356,7 +356,7 @@ $config['encryption_key'] = 'xyz'; // FM9nCgXE0a3DzrOSq6PxtN1e57lYm4sGAKTLw
 |
 */
 $config['sess_driver'] = 'database';
-$config['sess_cookie_name'] = 'sess';
+$config['sess_cookie_name'] = 'sess_2';
 $config['sess_expiration'] = 7200;
 $config['sess_save_path'] = 'sessions';
 $config['sess_match_ip'] = FALSE;
