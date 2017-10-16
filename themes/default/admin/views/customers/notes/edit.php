@@ -6,8 +6,8 @@
             </button>
             <h4 class="modal-title" id="myModalLabel"><?php echo (($note == null)?lang('add_note'):lang('edit_note')) . " (" . $company->name . ")"; ?></h4>
         </div>
-        <?php $attrib = array('data-toggle' => 'validator', 'role' => 'form');
-        echo admin_form_open("customers/edit_note/".$company->id."/".$page."/".(($note == null)?'':$note->id), $attrib); ?>
+        <?php $attrib = array('data-toggle' => 'validator', 'role' => 'form', 'id'=>'formEditNote');
+        echo admin_form_open("customers/edit_note/".$company->id."/XXXXX/".(($note == null)?'':$note->id), $attrib); ?>
         <div class="modal-body">
             <p><?= lang('enter_info'); ?></p>
 
@@ -38,3 +38,11 @@
 </div>
 <?= $modal_js ?>
 
+<script type="text/javascript">
+    var pathname = window.location.pathname;
+    pathname = pathname.substr(pathname.lastIndexOf('/') + 1);
+
+    var oldAction = $('#formEditNote').attr('action');
+    var newAction = oldAction.replace('XXXXX', pathname);
+    $('#formEditNote').attr('action', newAction);
+</script>

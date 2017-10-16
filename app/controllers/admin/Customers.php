@@ -784,6 +784,8 @@ class Customers extends MY_Controller
 
             if($page == 'customers') {
                 admin_redirect('customers');
+            } else if($page == 'forecast') {
+                admin_redirect('customers/forecast');
             } else {
                 admin_redirect('reports/customer_report/' . $company_id);
             }
@@ -793,7 +795,6 @@ class Customers extends MY_Controller
             $this->data['modal_js'] = $this->site->modal_js();
             $this->data['company'] = $company;
             $this->data['note'] = @$note;
-            $this->data['page'] = $page;
 
             $this->load->view($this->theme . 'customers/notes/edit', $this->data);
         }

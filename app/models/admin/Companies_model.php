@@ -455,7 +455,9 @@ class Companies_model extends CI_Model
                 ->limit(1)
                 ->get()->row();
 
-            $row[1] .= '<br/>'.$user_row->userName;
+            if(is_object($user_row)) {
+                $row[1] .= '<br/>' . $user_row->userName;
+            }
         }
 
         echo json_encode($arr);
