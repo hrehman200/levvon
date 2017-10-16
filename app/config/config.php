@@ -17,7 +17,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 | environments.
 |
 */
-$config['base_url'] = 'http://www.levvon.com/gaddyf/';
+$config['base_url'] = 'http://www.levvon.com/kenzo/';
 
 /*
 |--------------------------------------------------------------------------
