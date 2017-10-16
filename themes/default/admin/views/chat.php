@@ -262,15 +262,17 @@
                             restructureChatBoxes();
                         }
 
+                        var msgClass = item.f == 1 ? 'txt-green' : 'txt-blue';
+
                         if (item.s == 1) {
                             item.f = from_username;
                         }
                         if (item.s == 2) {
-                            $("#chatbox_"+chatboxtitle+" .chatboxcontent").append('<div class="chatboxmessage"><span class="chatboxinfo">'+item.m+'</span></div>');
+                            $("#chatbox_"+chatboxtitle+" .chatboxcontent").append('<div class="chatboxmessage '+msgClass+'"><span class="chatboxinfo">'+item.m+'</span></div>');
                         } else {
                             newMessages[chatboxtitle] = true;
                             newMessagesWin[chatboxtitle] = true;
-                            $("#chatbox_"+chatboxtitle+" .chatboxcontent").append('<div class="chatboxmessage"><span class="chatboxmessagefrom">'+ getTitle( item.fname )+':&nbsp;&nbsp;</span><span class="chatboxmessagecontent">'+item.m+'</span></div>');
+                            $("#chatbox_"+chatboxtitle+" .chatboxcontent").append('<div class="chatboxmessage '+msgClass+'"><span class="chatboxmessagefrom">'+ getTitle( item.fname )+':&nbsp;&nbsp;</span><span class="chatboxmessagecontent">'+item.m+'</span></div>');
                         }
 
                         $("#chatbox_"+chatboxtitle+" .chatboxcontent").scrollTop($("#chatbox_"+chatboxtitle+" .chatboxcontent")[0].scrollHeight);
@@ -363,7 +365,7 @@
                     <?=$this->security->get_csrf_token_name()?>:"<?=$this->security->get_csrf_hash()?>"
                 } , function(data){
                     message = message.replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\"/g,"&quot;");
-                    $("#chatbox_"+chatboxtitle+" .chatboxcontent").append('<div class="chatboxmessage"><span class="chatboxmessagefrom">'+getTitle(from_username)+':&nbsp;&nbsp;</span><span class="chatboxmessagecontent">'+message+'</span></div>');
+                    $("#chatbox_"+chatboxtitle+" .chatboxcontent").append('<div class="chatboxmessage '+'txt-green'+'"><span class="chatboxmessagefrom">'+getTitle(from_username)+':&nbsp;&nbsp;</span><span class="chatboxmessagecontent">'+message+'</span></div>');
                     $("#chatbox_"+chatboxtitle+" .chatboxcontent").scrollTop($("#chatbox_"+chatboxtitle+" .chatboxcontent")[0].scrollHeight);
                 });
             }
