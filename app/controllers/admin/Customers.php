@@ -48,7 +48,7 @@ class Customers extends MY_Controller
             </a> <a class=\"tip\" title='" . lang("list_addresses") . "' href='" . admin_url('customers/addresses/$1') . "' data-toggle='modal' data-target='#myModal'>
                 <i class=\"fa fa-location-arrow\"></i>
             </a>
-            </a> <a class=\"tip list-notes\" data-company-id='$1' title='" . lang("list_notes") . "' href='" . admin_url('customers/notes/$1/customers') . "' data-toggle='modal' data-target='#myModal'>
+            </a> <a class=\"tip list-notes\" data-company-id='$1' href='" . admin_url('customers/notes/$1/customers') . "' data-toggle='modal' data-target='#myModal' data-last-note='@@@@@'>
                 <i class=\"fa fa-newspaper-o\"></i>
             </a>
             <a class=\"tip\" title='" . lang("list_users") . "' href='" . admin_url('customers/users/$1') . "' data-toggle='modal' data-target='#myModal'>
@@ -62,7 +62,16 @@ class Customers extends MY_Controller
             </a>
         </div>", "id");
         //->unset_column('id');
-        echo $this->datatables->generate();
+
+        $json = $this->datatables->generate();
+        $arr = json_decode($json, true);
+
+        foreach($arr['aaData'] as &$row) {
+            $last_note = $this->companies_model->getLatestUnreadNote($row[0]);
+            $row[10] = str_replace('@@@@@', htmlspecialchars(json_encode($last_note), ENT_QUOTES, 'UTF-8'), $row[10]);
+        }
+
+        echo json_encode($arr);
     }
 
     function view($id = NULL)

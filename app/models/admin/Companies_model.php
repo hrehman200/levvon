@@ -332,7 +332,7 @@ class Companies_model extends CI_Model
             </a> <a class=\"tip\" title='" . lang("list_addresses") . "' href='" . admin_url('customers/addresses/$1') . "' data-toggle='modal' data-target='#myModal'>
                 <i class=\"fa fa-location-arrow\"></i>
             </a>
-            </a> <a class=\"tip list-notes\" data-company-id='$1' title='" . lang("list_notes") . "' href='" . admin_url('customers/notes/$1/customers') . "' data-toggle='modal' data-target='#myModal'>
+            </a> <a class=\"tip list-notes\" data-company-id='$1' href='" . admin_url('customers/notes/$1/customers') . "' data-toggle='modal' data-target='#myModal' data-last-note='@@@@@'>
                 <i class=\"fa fa-newspaper-o\"></i>
             </a>
             <a class=\"tip\" title='" . lang("list_users") . "' href='" . admin_url('customers/users/$1') . "' data-toggle='modal' data-target='#myModal'>
@@ -355,6 +355,9 @@ class Companies_model extends CI_Model
             $row[4] = $avg_data['avg_buying_date'];
             $row[5] = $avg_data['avg_product_name'];
             $row[6] = $avg_data['days_inactive'];
+
+            $last_note = $this->getLatestUnreadNote($row[0]);
+            $row[7] = str_replace('@@@@@', htmlspecialchars(json_encode($last_note), ENT_QUOTES, 'UTF-8'), $row[7]);
         }
 
         switch($_POST['iSortCol_0']) {
@@ -434,6 +437,9 @@ class Companies_model extends CI_Model
             ->where('companyId', $customer_id)
             ->where('isDeleted', 0)
             ->add_column("Actions", "<div class=\"text-center\">
+                <a class=\"tip send-note-msg\" title='" . lang("edit_note") . "' data-id='$1' href='" . admin_url('messages') . "' data-toggle='modal' data-target='#myModal2'>
+                    <i class=\"fa fa-envelope-o\"></i>
+                </a>
                 <a class=\"tip edit-note\" title='" . lang("edit_note") . "' data-id='$1' href='" . admin_url('customers/edit_note/'.$customer_id.'/'.$page.'/$1') . "' data-toggle='modal' data-target='#myModal2'>
                     <i class=\"fa fa-edit\"></i>
                 </a>
@@ -474,6 +480,24 @@ class Companies_model extends CI_Model
         }
         return FALSE;
     }
+
+    /**
+     * @param $customer_id
+     * @return bool
+     */
+    public function getLatestUnreadNote($customer_id) {
+        $q = $this->db->select('companyTitle, description')
+            ->order_by('created', 'desc')
+            ->limit(1)
+            ->get_where('company_notes', array('companyId' => $customer_id, 'isDeleted'=>0));
+
+        if ($q->num_rows() > 0) {
+            return $q->row();
+        }
+        return FALSE;
+    }
+
+
 
     // **************************************** CUSTOMER NOTES] ****************************************/
 

@@ -144,6 +144,26 @@
 ?>
 
 <script type="text/javascript">
+
+    $('#CusData').on('hover', '.list-notes', function (e) {
+
+        if (e.type === 'mouseenter') {
+
+            var lastNote = $(this).data("last-note");
+            var el       = $(this);
+            if (lastNote) {
+                el.unbind('hover').popover({
+                    content: lastNote.description,
+                    title: '<b>' + lastNote.companyTitle + '</b>',
+                    html: true,
+                    placement: "left"
+                }).popover('show');
+            }
+        } else {
+            $(this).popover('hide');
+        }
+    });
+
     function getUnreadCompanyNoteCount() {
 
         var companyIds = $('.list-notes').map(function() {

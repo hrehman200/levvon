@@ -16,17 +16,17 @@
                 $.ajax({'dataType': 'json', 'type': 'POST', 'url': sSource, 'data': aoData, 'success': fnCallback});
             },
             'fnRowCallback': function (nRow, aData, iDisplayIndex) {
-                nRow.id = aData[0];
+                nRow.id        = aData[0];
                 nRow.className = "customer_details_link";
                 return nRow;
             },
-            'fnDrawCallback': function() {
+            'fnDrawCallback': function () {
                 getUnreadCompanyNoteCount();
             },
             "aoColumns": [{
                 "bSortable": false,
                 "bVisible": false
-            }, null, null, null, null, null, null, {bSortable:false, bSearchable:false}]
+            }, null, null, null, null, null, null, {bSortable: false, bSearchable: false}]
         }).dtFilter([
             {column_number: 1, filter_default_label: "[Company]", filter_type: "text", data: []},
             {column_number: 2, filter_default_label: "[Name]", filter_type: "text", data: []},
@@ -36,7 +36,7 @@
             {column_number: 6, filter_default_label: "[Days Inactive]", filter_type: "text", data: []},
         ], "footer");
         $('#myModal').on('hidden.bs.modal', function () {
-            cTable.fnDraw( false );
+            cTable.fnDraw(false);
         });
     });
 </script>
@@ -80,7 +80,12 @@
                             <th style="min-width:30px; width: 30px; text-align: center;">
                                 <input class="checkbox checkft" type="checkbox" name="check"/>
                             </th>
-                            <th></th><th></th><th></th><th></th><th></th><th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
                             <th style="min-width:135px !important;" class="text-center"><?= lang("actions"); ?></th>
                         </tr>
                         </tfoot>
@@ -92,9 +97,29 @@
 </div>
 
 <script type="text/javascript">
+
+    $('#CusData').on('hover', '.list-notes', function (e) {
+
+        if (e.type === 'mouseenter') {
+
+            var lastNote = $(this).data("last-note");
+            var el       = $(this);
+            if (lastNote) {
+                el.unbind('hover').popover({
+                    content: lastNote.description,
+                    title: '<b>' + lastNote.companyTitle + '</b>',
+                    html: true,
+                    placement: "left"
+                }).popover('show');
+            }
+        } else {
+            $(this).popover('hide');
+        }
+    });
+
     function getUnreadCompanyNoteCount() {
 
-        var companyIds = $('.list-notes').map(function() {
+        var companyIds = $('.list-notes').map(function () {
             return $(this).data("company-id");
         }).get();
 
@@ -106,8 +131,8 @@
                 company_ids: companyIds
             },
             success: function (response) {
-                for(var i=0; i<response.data.length; i++) {
-                    if(response.data[i].unread > 0) {
+                for (var i = 0; i < response.data.length; i++) {
+                    if (response.data[i].unread > 0) {
                         $('a[data-company-id="' + response.data[i].company_id + '"]')
                             .parents('tr:eq(0)').find('td').css({
                             'backgroundColor': 'lightgreen',
@@ -115,7 +140,6 @@
                         }).end().end();
                     }
                 }
-
 
             }
         });
