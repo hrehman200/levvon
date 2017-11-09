@@ -57,10 +57,15 @@ class Messages extends MY_Controller {
             $attachment = null;
 
             $this->load->library('parser');
+
+            $users = $this->site->getUsersFromIds($to);
+            $user_names = array_map(function($v) {return $v['first_name']." ".$v['last_name'];}, $users);
+            $emails = array_map(function($v) {return $v['email'];}, $users);
+
             $parse_data = array(
                 'contact_person' => $company_note['name'],
                 'company'        => $company_note['company'],
-                'username'       => $company_note['username'],
+                'username'       => implode(', ', $user_names),
                 'msg_date'       => $company_note['created'],
                 'site_link'      => base_url(),
                 'site_name'      => $this->Settings->site_name,
@@ -70,7 +75,6 @@ class Messages extends MY_Controller {
             $message    = $this->parser->parse_string($msg, $parse_data);
 
             try {
-                $emails = $this->site->getUserEmailsFromIds($to);
                 if ($this->sma->send_email($emails, $subject, $message, null, null, $attachment, $cc, $bcc)) {
 
                     $sender_id  = $this->session->userdata('user_id');
@@ -210,7 +214,8 @@ class Messages extends MY_Controller {
             $message = $msg . '<br/><br/>' . $prev_msgs;
 
             try {
-                $emails = $this->site->getUserEmailsFromIds($to);
+                $users = $this->site->getUsersFromIds($to);
+                $emails = array_map(function($v) {return $v['email'];}, $users);
                 if ($this->sma->send_email($emails, $subject, $message, null, null, $attachment, $cc, $bcc)) {
 
                     $sender_id  = $this->session->userdata('user_id');

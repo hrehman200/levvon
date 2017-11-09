@@ -100,12 +100,12 @@ class Site extends CI_Model
         return FALSE;
     }
 
-    public function getUserEmailsFromIds($ids) {
-        $q = $this->db->select('email')
+    public function getUsersFromIds($ids) {
+        $q = $this->db->select('id, email, first_name, last_name')
             ->where_in('id', $ids)
             ->get('users');
 
-        return array_map(function($v) { return $v['email']; }, $q->result_array());
+        return $q->result_array();
     }
 
     public function getProductByID($id) {
