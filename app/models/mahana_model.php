@@ -4,31 +4,31 @@ class Mahana_model extends CI_Model {
     /**
      * Send a New Message
      *
+     * @param int $company_note_id
      * @param   integer $sender_id
      * @param   mixed $recipients A single integer or an array of integers
      * @param   string $subject
      * @param   string $body
      * @param   integer $priority
-     * @return  integer  $new_thread_id
+     * @return int $new_thread_id
      */
-    function send_new_message($sender_id, $recipients, $subject, $body, $priority) {
+    function send_new_message($company_note_id, $sender_id, $recipients, $subject, $body, $priority) {
         $this->db->trans_start();
 
-        $thread_id = $this->_insert_thread($subject);
-        $msg_id    = $this->_insert_message($thread_id, $sender_id, $body, $priority);
+        $thread_id = $this->_insert_thread($company_note_id, $subject);
+        $msg_id = $this->_insert_message($thread_id, $sender_id, $body, $priority);
 
         // Create batch inserts
         $participants[] = array('thread_id' => $thread_id, 'user_id' => $sender_id);
         $statuses[]     = array('message_id' => $msg_id, 'user_id' => $sender_id, 'status' => MSG_STATUS_READ);
 
         if (!is_array($recipients)) {
-            $participants[] = array('thread_id' => $thread_id, 'user_id' => $recipients);
-            $statuses[]     = array('message_id' => $msg_id, 'user_id' => $recipients, 'status' => MSG_STATUS_UNREAD);
-        } else {
-            foreach ($recipients as $recipient) {
-                $participants[] = array('thread_id' => $thread_id, 'user_id' => $recipient);
-                $statuses[]     = array('message_id' => $msg_id, 'user_id' => $recipient, 'status' => MSG_STATUS_UNREAD);
-            }
+            $recipients = [$recipients];
+        }
+
+        foreach ($recipients as $recipient) {
+            $participants[] = array('thread_id' => $thread_id, 'user_id' => $recipient);
+            $statuses[]     = array('message_id' => $msg_id, 'user_id' => $recipient, 'status' => MSG_STATUS_UNREAD);
         }
 
         $this->_insert_participants($participants);
@@ -43,6 +43,43 @@ class Mahana_model extends CI_Model {
         }
 
         return $thread_id;
+    }
+
+    function reply_to_thread($thread_id, $sender_id, $recipients, $body) {
+        $this->db->trans_start();
+
+        $msg_id = $this->_insert_message($thread_id, $sender_id, $body, PRIORITY_HIGH);
+
+        $existing_recipients = $this->_get_thread_participants($thread_id, $sender_id);
+        $existing_recipients = array_map(function($v) {
+            return $v['user_id'];
+        }, $existing_recipients);
+
+        $participants = [];
+        $non_existing_recipients = array_diff($recipients, $existing_recipients);
+        foreach ($non_existing_recipients as $r) {
+            $participants[] = array('thread_id' => $thread_id, 'user_id' => $r);
+        }
+        $this->_insert_participants($participants);
+
+        $statuses = [];
+        $statuses[] = array('message_id' => $msg_id, 'user_id' => $sender_id, 'status' => MSG_STATUS_READ);
+        $existing_recipients = $this->_get_thread_participants($thread_id, $sender_id);
+        $existing_recipients = array_diff($existing_recipients, [$sender_id]);
+        foreach ($existing_recipients as $ep) {
+            $statuses[] = array('message_id' => $msg_id, 'user_id' => $ep['user_id'], 'status' => MSG_STATUS_UNREAD);
+        }
+        $this->_insert_statuses($statuses);
+
+        $this->db->trans_complete();
+
+        if ($this->db->trans_status() === FALSE) {
+            $this->db->trans_rollback();
+
+            return FALSE;
+        }
+
+        return $msg_id;
     }
 
     // ------------------------------------------------------------------------
@@ -142,6 +179,21 @@ class Mahana_model extends CI_Model {
         return $query->result_array();
     }
 
+    /**
+     * @param $thread_id
+     * @return mixed
+     */
+    function getThreadMessages($thread_id) {
+        $sql = sprintf('SELECT m.*, %s
+            FROM %smsg_messages m
+            JOIN %s ON %s = m.sender_id
+            WHERE m.thread_id = %d
+            ORDER BY m.cdate DESC', USER_TABLE_USERNAME, $this->db->dbprefix, $this->db->dbprefix . USER_TABLE_TABLENAME, USER_TABLE_ID, $thread_id);
+
+        return $this->db->query($sql)
+            ->result_array();
+    }
+
     // ------------------------------------------------------------------------
 
     /**
@@ -153,23 +205,35 @@ class Mahana_model extends CI_Model {
      * @return  array
      */
     function get_all_threads($user_id, $full_thread = FALSE, $order_by = 'asc') {
-        $sql = 'SELECT m.*, s.status, t.subject, ' . USER_TABLE_USERNAME .
+        $sql = 'SELECT m.*, s.status, t.subject, '.USER_TABLE_ID . ' AS user_id,' . USER_TABLE_USERNAME .
             ' FROM ' . $this->db->dbprefix . 'msg_participants p ' .
             ' JOIN ' . $this->db->dbprefix . 'msg_threads t ON (t.id = p.thread_id) ' .
             ' JOIN ' . $this->db->dbprefix . 'msg_messages m ON (m.thread_id = t.id) ' .
             ' JOIN ' . $this->db->dbprefix . USER_TABLE_TABLENAME . ' ON (' . USER_TABLE_ID . ' = m.sender_id) ' .
             ' JOIN ' . $this->db->dbprefix . 'msg_status s ON (s.message_id = m.id AND s.user_id = ? ) ' .
-            ' WHERE (p.user_id = ? OR m.sender_id = ?) ';
+            ' WHERE (p.user_id = ? AND m.sender_id != ?) ';
 
         if (!$full_thread) {
             $sql .= ' AND m.cdate >= p.cdate';
         }
 
-        $sql .= ' ORDER BY t.id ' . $order_by . ', m.cdate ' . $order_by;
+        //$sql .= ' GROUP BY t.id';
+        $sql .= ' ORDER BY m.cdate ' . $order_by . ', t.id ' . $order_by;
 
         $query = $this->db->query($sql, array($user_id, $user_id, $user_id));
 
-        return $query->result_array();
+        // manual group by
+        $arr = $query->result_array();
+        $exists = [];
+        foreach($arr as $i=>$item) {
+            if(in_array($item['thread_id'], $exists)) {
+                unset($arr[$i]);
+            } else {
+                $exists[] = $item['thread_id'];
+            }
+        }
+
+        return $arr;
     }
 
     // ------------------------------------------------------------------------
@@ -177,13 +241,18 @@ class Mahana_model extends CI_Model {
     /**
      * Change Message Status
      *
-     * @param   integer $msg_id
+     * @param integer|array $msg_id
      * @param   integer $user_id
      * @param   integer $status_id
      * @return  integer
      */
     function update_message_status($msg_id, $user_id, $status_id) {
-        $this->db->where(array('message_id' => $msg_id, 'user_id' => $user_id));
+        if(is_array($msg_id)) {
+            $this->db->where_in('message_id', $msg_id)
+                ->where('user_id', $user_id);
+        } else {
+            $this->db->where(array('message_id' => $msg_id, 'user_id' => $user_id));
+        }
         $this->db->update('msg_status', array('status' => $status_id));
 
         return $this->db->affected_rows();
@@ -336,13 +405,18 @@ class Mahana_model extends CI_Model {
     /**
      * Insert Thread
      *
-     * @param   string $subject
-     * @return  integer
+     * @param int $company_note_id
+     * @param string $subject
+     * @return int
      */
-    private function _insert_thread($subject) {
-        $insert_id = $this->db->insert('msg_threads', array('subject' => $subject));
+    private function _insert_thread($company_note_id, $subject) {
+        $this->db->insert('msg_threads', array(
+            'company_note_id' => $company_note_id,
+            'subject' => $subject
+        ));
 
-        return $this->db->insert_id();
+        $insert_id = $this->db->insert_id();
+        return $insert_id;
     }
 
     /**

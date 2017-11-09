@@ -357,6 +357,13 @@
                         if ($Owner || $Admin) {
                             ?>
 
+                            <li class="mm_messages">
+                                <a href="<?= admin_url('messages') ?>">
+                                    <i class="fa fa-envelope"></i>
+                                    <span class="text">Messages</span>
+                                </a>
+                            </li>
+
                             <li class="mm_products">
                                 <a class="dropmenu" href="#">
                                     <i class="fa fa-barcode"></i>

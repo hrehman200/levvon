@@ -91,6 +91,23 @@ class Site extends CI_Model
         return FALSE;
     }
 
+    public function getUsers() {
+        $q = $this->db->select('id, CONCAT(first_name, " ", last_name) AS name', false)
+                ->get('users');
+        if ($q->num_rows() > 0) {
+            return $q->result_array();
+        }
+        return FALSE;
+    }
+
+    public function getUserEmailsFromIds($ids) {
+        $q = $this->db->select('email')
+            ->where_in('id', $ids)
+            ->get('users');
+
+        return array_map(function($v) { return $v['email']; }, $q->result_array());
+    }
+
     public function getProductByID($id) {
         $q = $this->db->get_where('products', array('id' => $id), 1);
         if ($q->num_rows() > 0) {

@@ -437,7 +437,7 @@ class Companies_model extends CI_Model
             ->where('companyId', $customer_id)
             ->where('isDeleted', 0)
             ->add_column("Actions", "<div class=\"text-center\">
-                <a class=\"tip send-note-msg\" title='" . lang("edit_note") . "' data-id='$1' href='" . admin_url('messages') . "' data-toggle='modal' data-target='#myModal2'>
+                <a class=\"tip send-note-msg\" title='Send message related to this note' href='" . admin_url('messages/add/$1') . "' data-toggle='modal' data-target='#myModal2'>
                     <i class=\"fa fa-envelope-o\"></i>
                 </a>
                 <a class=\"tip edit-note\" title='" . lang("edit_note") . "' data-id='$1' href='" . admin_url('customers/edit_note/'.$customer_id.'/'.$page.'/$1') . "' data-toggle='modal' data-target='#myModal2'>
@@ -474,11 +474,20 @@ class Companies_model extends CI_Model
      * @return bool
      */
     public function getNoteById($note_id) {
-        $q = $this->db->get_where('company_notes', array('id' => $note_id), 1);
-        if ($q->num_rows() > 0) {
-            return $q->row();
+        $result = $this->db->select('company_notes.*, companies.name, companies.company, CONCAT(first_name, " ", last_name) AS username', false)
+                ->from('company_notes')
+                ->join('companies', 'company_notes.companyId = companies.id', 'INNER')
+                ->join('company_notes_readby', 'company_notes_readby.note_id = company_notes.id', 'INNER')
+                ->join('users', 'company_notes_readby.user_id = users.id', 'INNER')
+                ->where('company_notes.id', $note_id)
+                ->limit(1)
+                ->get()
+                ->result_array();
+
+        if(count($result) > 0) {
+            return $result[0];
         }
-        return FALSE;
+        return false;
     }
 
     /**

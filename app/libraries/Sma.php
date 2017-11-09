@@ -219,8 +219,7 @@ class Sma
 
     public function send_email($to, $subject, $message, $from = null, $from_name = null, $attachment = null, $cc = null, $bcc = null)
     {
-        list($user, $domain) = explode('@', $to);
-        if ($domain != 'tecdiary.com') {
+        if (true) {
             if ($this->Settings->protocol == 'smtp') {
                 $this->load->library('tec_mail');
                 return $this->tec_mail->send_mail($to, $subject, $message, $from, $from_name, $attachment, $cc, $bcc);
