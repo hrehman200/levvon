@@ -261,6 +261,16 @@ if (e("#sidebar-left").hasClass("minified")) {
 
 $(document).ready(function() {
     cssStyle();
+
+    $.ajax({
+        type:'GET',
+        dataType: 'json',
+        url: site.base_url + "messages/getUnreadMsgCount",
+        success:function(response){
+            $('.sp-unread-msg').removeClass('hidden').html(response.data);
+        }
+    });
+
     $('select, .select').select2({minimumResultsForSearch: 7});
     $('#customer, #rcustomer').select2({
        minimumInputLength: 1,
@@ -317,6 +327,8 @@ $(document).ready(function() {
             return '<b>' + $('label[for="' + $(this).attr('id') + '"]').text() + '</b>';
         }
     });
+
+
 });
 
 $(document).on('click', '*[data-toggle="lightbox"]', function(event) {

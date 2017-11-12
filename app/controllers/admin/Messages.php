@@ -29,6 +29,15 @@ class Messages extends MY_Controller {
         $this->page_construct('customers/messages/index', $meta, $this->data);
     }
 
+    function getUnreadMsgCount() {
+        $this->sma->checkPermissions('customers');
+
+        $user_id = $this->session->userdata('user_id');
+        $unread_count = $this->mahana_model->get_unread_msg_count($user_id);
+
+        echo json_encode(array('success'=> 1, 'data'=>$unread_count));
+    }
+
     public function add($note_id) {
         $this->sma->checkPermissions(false, true);
 

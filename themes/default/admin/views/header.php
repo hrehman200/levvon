@@ -361,6 +361,7 @@
                                 <a href="<?= admin_url('messages') ?>">
                                     <i class="fa fa-envelope"></i>
                                     <span class="text">Messages</span>
+                                    <span class="badge badge-important hidden sp-unread-msg"></span>
                                 </a>
                             </li>
 

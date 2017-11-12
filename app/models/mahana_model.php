@@ -1,6 +1,17 @@
 <?php if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Mahana_model extends CI_Model {
+
+    function get_unread_msg_count($user_id) {
+        $result = $this->db->select('COUNT(*) AS unread_count', false)
+                    ->where('user_id', $user_id)
+                    ->where('status', MSG_STATUS_UNREAD)
+                    ->get('msg_status')
+                    ->row();
+
+        return $result->unread_count;
+    }
+
     /**
      * Send a New Message
      *
