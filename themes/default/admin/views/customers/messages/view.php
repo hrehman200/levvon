@@ -2,7 +2,8 @@
 <script>
     $(document).ready(function () {
         var tblThread = $('#tblThread').dataTable({
-            "bSort": false,
+            "bSort": true,
+            "aaSorting": [[ 2, "desc" ]],
             "bInfo": false,
             "bPaginate": false,
             'bProcessing': true,
