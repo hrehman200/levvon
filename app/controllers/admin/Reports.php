@@ -1032,11 +1032,11 @@ class Reports extends MY_Controller
         if ($pdf || $xls) {
 
             $this->db
-                ->select("date, reference_no, biller, customer, GROUP_CONCAT(CONCAT(" . $this->db->dbprefix('sale_items') . ".product_name, ' (', " . $this->db->dbprefix('sale_items') . ".quantity, ')') SEPARATOR '\n') as iname, grand_total, paid, payment_status", FALSE)
+                ->select("date, reference_no, biller, customer, GROUP_CONCAT(CONCAT(" . $this->db->dbprefix('sale_items') . ".product_name, ' (', " . $this->db->dbprefix('sale_items') . ".quantity, ')') SEPARATOR '\n') as iname, grand_total, paid, payment_status, DATEDIFF(CURDATE(), date) AS age", FALSE)
                 ->from('sales')
                 ->join('sale_items', 'sale_items.sale_id=sales.id', 'left')
                 ->join('warehouses', 'warehouses.id=sales.warehouse_id', 'left')
-                ->group_by('sales.id')
+                //->group_by('sales.id')
                 ->order_by('sales.date desc');
 
             if ($user) {
@@ -1087,6 +1087,7 @@ class Reports extends MY_Controller
                 $this->excel->getActiveSheet()->SetCellValue('G1', lang('paid'));
                 $this->excel->getActiveSheet()->SetCellValue('H1', lang('balance'));
                 $this->excel->getActiveSheet()->SetCellValue('I1', lang('payment_status'));
+                $this->excel->getActiveSheet()->SetCellValue('I1', lang('age_days'));
 
                 $row = 2;
                 $total = 0;
@@ -1102,6 +1103,7 @@ class Reports extends MY_Controller
                     $this->excel->getActiveSheet()->SetCellValue('G' . $row, $data_row->paid);
                     $this->excel->getActiveSheet()->SetCellValue('H' . $row, ($data_row->grand_total - $data_row->paid));
                     $this->excel->getActiveSheet()->SetCellValue('I' . $row, lang($data_row->payment_status));
+                    $this->excel->getActiveSheet()->SetCellValue('J' . $row, lang($data_row->age));
                     $total += $data_row->grand_total;
                     $paid += $data_row->paid;
                     $balance += ($data_row->grand_total - $data_row->paid);
@@ -1146,7 +1148,7 @@ class Reports extends MY_Controller
             $si .= " GROUP BY {$this->db->dbprefix('sale_items')}.sale_id ) FSI";
             $this->load->library('datatables');
             $this->datatables
-                ->select("DATE_FORMAT(date, '%Y-%m-%d %T') as date, reference_no, biller, customer, FSI.item_nane as iname, grand_total, paid, (grand_total-paid) as balance, payment_status, {$this->db->dbprefix('sales')}.id as id", FALSE)
+                ->select("DATE_FORMAT(date, '%Y-%m-%d %T') as date, reference_no, biller, customer, FSI.item_nane as iname, grand_total, paid, (grand_total-paid) as balance, payment_status, DATEDIFF(CURDATE(), date) AS age, {$this->db->dbprefix('sales')}.id as id", FALSE)
                 ->from('sales')
                 ->join($si, 'FSI.sale_id=sales.id', 'left')
                 ->join('warehouses', 'warehouses.id=sales.warehouse_id', 'left');

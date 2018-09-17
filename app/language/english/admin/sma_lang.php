@@ -582,3 +582,4 @@ $lang['sitemap']                            = "Sitemap";
 $lang['visit']                              = "Visit";
 $lang['bank_details']                       = "Bank Details";
 $lang['bank_details_tip']                   = "(if you want to accept direct bank-in/transfer payments)";
+$lang['age_days'] = 'Age (Days)';

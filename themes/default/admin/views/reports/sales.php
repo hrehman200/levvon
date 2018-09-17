@@ -58,7 +58,7 @@ if ($this->input->post('end_date')) {
             "aoColumns": [{"mRender": fld}, null, null, null, {
                 "bSearchable": false,
                 "mRender": pqFormat
-            }, {"mRender": currencyFormat}, {"mRender": currencyFormat}, {"mRender": currencyFormat}, {"mRender": row_status}],
+            }, {"mRender": currencyFormat}, {"mRender": currencyFormat}, {"mRender": currencyFormat}, {"mRender": row_status}, null],
             "fnFooterCallback": function (nRow, aaData, iStart, iEnd, aiDisplay) {
                 var gtotal = 0, paid = 0, balance = 0;
                 for (var i = 0; i < aaData.length; i++) {
@@ -280,6 +280,7 @@ if ($this->input->post('end_date')) {
                             <th><?= lang("paid"); ?></th>
                             <th><?= lang("balance"); ?></th>
                             <th><?= lang("payment_status"); ?></th>
+                            <th><?= lang("age_days"); ?></th>
                         </tr>
                         </thead>
                         <tbody>
@@ -297,6 +298,7 @@ if ($this->input->post('end_date')) {
                             <th><?= lang("grand_total"); ?></th>
                             <th><?= lang("paid"); ?></th>
                             <th><?= lang("balance"); ?></th>
+                            <th></th>
                             <th></th>
                         </tr>
                         </tfoot>
