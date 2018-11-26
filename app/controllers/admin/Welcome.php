@@ -36,6 +36,13 @@ class Welcome extends MY_Controller
         $this->data['customers'] = $this->db_model->getLatestCustomers();
         $this->data['suppliers'] = $this->db_model->getLatestSuppliers();
         $this->data['chatData'] = $this->db_model->getChartData();
+        // somehow on chart monthly sales value is not correct, client wanted to show the same value as in Reports->Monthly Sales->Total cell
+        foreach($this->data['chatData'] as $row) {
+            $this->load->admin_model('reports_model');
+            $total_sales = $this->reports_model->getSaleOfMonth($row->month);
+            $row->total_sales = $total_sales;
+        }
+
         $this->data['stock'] = $this->db_model->getStockValue();
         $this->data['bs'] = $this->db_model->getBestSeller();
 

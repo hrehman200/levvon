@@ -171,6 +171,22 @@ class Reports_model extends CI_Model
         return FALSE;
     }
 
+    public function getSaleOfMonth($month, $warehouse_id = NULL)
+    {
+        $myQuery = "SELECT SUM( COALESCE( grand_total, 0 ) ) AS total
+            FROM " . $this->db->dbprefix('sales') . " WHERE ";
+        if ($warehouse_id) {
+            $myQuery .= " warehouse_id = {$warehouse_id} AND ";
+        }
+        $myQuery .= " DATE_FORMAT( date,  '%Y-%m' ) =  '{$month}'
+            GROUP BY date_format( date, '%c' ) ORDER BY date_format( date, '%c' ) ASC";
+        $q = $this->db->query($myQuery, false);
+        if ($q->num_rows() > 0) {
+            return $q->result()[0]->total;
+        }
+        return FALSE;
+    }
+
     public function getStaffDailySales($user_id, $year, $month, $warehouse_id = NULL)
     {
         $myQuery = "SELECT DATE_FORMAT( date,  '%e' ) AS date, SUM( COALESCE( product_tax, 0 ) ) AS tax1, SUM( COALESCE( order_tax, 0 ) ) AS tax2, SUM( COALESCE( grand_total, 0 ) ) AS total, SUM( COALESCE( total_discount, 0 ) ) AS discount, SUM( COALESCE( shipping, 0 ) ) AS shipping

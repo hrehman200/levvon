@@ -21,7 +21,7 @@ function row_status($x)
 <?php if (($Owner || $Admin) && $chatData) {
     foreach ($chatData as $month_sale) {
         $months[] = date('M-Y', strtotime($month_sale->month));
-        $msales[] = $month_sale->sales;
+        $msales[] = $month_sale->total_sales;
         $mtax1[] = $month_sale->tax1;
         $mtax2[] = $month_sale->tax2;
         $mpurchases[] = $month_sale->purchases;
@@ -576,14 +576,14 @@ function row_status($x)
                 },
                 series: [{
                     type: 'column',
-                    name: '<?= lang("sp_tax"); ?>',
+                    name: 'Sales Paid',
                     data: [<?php
                     echo implode(', ', $mtax1);
                     ?>]
                 },
                     {
                         type: 'column',
-                        name: '<?= lang("order_tax"); ?>',
+                        name: 'Sales Balance',
                         data: [<?php
                     echo implode(', ', $mtax2);
                     ?>]
