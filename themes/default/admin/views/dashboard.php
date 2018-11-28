@@ -22,6 +22,8 @@ function row_status($x)
     foreach ($chatData as $month_sale) {
         $months[] = date('M-Y', strtotime($month_sale->month));
         $msales[] = $month_sale->total_sales;
+        $msales_paid[] = $month_sale->sales_paid;
+        $msales_balance[] = $month_sale->sales_balance;
         $mtax1[] = $month_sale->tax1;
         $mtax2[] = $month_sale->tax2;
         $mpurchases[] = $month_sale->purchases;
@@ -578,14 +580,14 @@ function row_status($x)
                     type: 'column',
                     name: 'Sales Paid',
                     data: [<?php
-                    echo implode(', ', $mtax1);
+                    echo implode(', ', $msales_paid);
                     ?>]
                 },
                     {
                         type: 'column',
                         name: 'Sales Balance',
                         data: [<?php
-                    echo implode(', ', $mtax2);
+                    echo implode(', ', $msales_balance);
                     ?>]
                     },
                     {

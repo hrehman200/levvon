@@ -39,8 +39,10 @@ class Welcome extends MY_Controller
         // somehow on chart monthly sales value is not correct, client wanted to show the same value as in Reports->Monthly Sales->Total cell
         foreach($this->data['chatData'] as $row) {
             $this->load->admin_model('reports_model');
-            $total_sales = $this->reports_model->getSaleOfMonth($row->month);
-            $row->total_sales = $total_sales;
+            $sale_of_month = $this->reports_model->getSaleOfMonth($row->month);
+            $row->total_sales = $sale_of_month['total_sales'];
+            $row->sales_paid = $sale_of_month['sales_paid'];
+            $row->sales_balance = $sale_of_month['sales_balance'];
         }
 
         $this->data['stock'] = $this->db_model->getStockValue();

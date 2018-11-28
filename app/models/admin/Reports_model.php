@@ -173,7 +173,8 @@ class Reports_model extends CI_Model
 
     public function getSaleOfMonth($month, $warehouse_id = NULL)
     {
-        $myQuery = "SELECT SUM( COALESCE( grand_total, 0 ) ) AS total
+        $myQuery = "SELECT SUM( COALESCE( grand_total, 0 ) ) AS total,
+            SUM(COALESCE(paid, 0)) as paid
             FROM " . $this->db->dbprefix('sales') . " WHERE ";
         if ($warehouse_id) {
             $myQuery .= " warehouse_id = {$warehouse_id} AND ";
@@ -182,7 +183,12 @@ class Reports_model extends CI_Model
             GROUP BY date_format( date, '%c' ) ORDER BY date_format( date, '%c' ) ASC";
         $q = $this->db->query($myQuery, false);
         if ($q->num_rows() > 0) {
-            return $q->result()[0]->total;
+            $row = $q->result()[0];
+            return [
+                'total_sales' => $row->total,
+                'sales_paid'  => $row->paid,
+                'sales_balance'  => $row->total - $row->paid,
+            ];
         }
         return FALSE;
     }
