@@ -534,6 +534,55 @@ class Settings_model extends CI_Model
         return FALSE;
     }
 
+    public function getRegionByID($id) {
+        $q = $this->db->get_where("regions", array('id' => $id), 1);
+        if ($q->num_rows() > 0) {
+            return $q->row();
+        }
+        return FALSE;
+    }
+
+    public function getRegionByCode($code) {
+        $q = $this->db->get_where("regions", array('code' => $code), 1);
+        if ($q->num_rows() > 0) {
+            return $q->row();
+        }
+        return FALSE;
+    }
+
+    public function addRegion($data) {
+        if ($this->db->insert("regions", $data)) {
+            return true;
+        }
+        return false;
+    }
+
+    public function addRegions($data) {
+        if ($this->db->insert_batch("regions", $data)) {
+            return true;
+        }
+        return false;
+    }
+
+    public function updateRegion($id, $data = array()) {
+        if ($this->db->update("regions", $data, array('id' => $id))) {
+            return true;
+        }
+        return false;
+    }
+
+    public function hasRegionRecord($id) {
+        $this->db->where('category_id', $id);
+        return $this->db->count_all_results('expenses');
+    }
+
+    public function deleteRegion($id) {
+        if ($this->db->delete("regions", array('id' => $id))) {
+            return true;
+        }
+        return FALSE;
+    }
+
     public function addUnit($data)
     {
         if ($this->db->insert("units", $data)) {

@@ -1880,6 +1880,13 @@ class system_settings extends MY_Controller
         $this->page_construct('settings/expense_categories', $meta, $this->data);
     }
 
+    function regions() {
+        $this->data['error'] = validation_errors() ? validation_errors() : $this->session->flashdata('error');
+        $bc = array(array('link' => base_url(), 'page' => lang('home')), array('link' => admin_url('system_settings'), 'page' => lang('system_settings')), array('link' => '#', 'page' => 'regions'));
+        $meta = array('page_title' => lang('categories'), 'bc' => $bc);
+        $this->page_construct('settings/regions', $meta, $this->data);
+    }
+
     function getExpenseCategories()
     {
 
@@ -1888,6 +1895,16 @@ class system_settings extends MY_Controller
             ->select("id, code, name")
             ->from("expense_categories")
             ->add_column("Actions", "<div class=\"text-center\"><a href='" . admin_url('system_settings/edit_expense_category/$1') . "' data-toggle='modal' data-target='#myModal' class='tip' title='" . lang("edit_expense_category") . "'><i class=\"fa fa-edit\"></i></a> <a href='#' class='tip po' title='<b>" . lang("delete_expense_category") . "</b>' data-content=\"<p>" . lang('r_u_sure') . "</p><a class='btn btn-danger po-delete' href='" . admin_url('system_settings/delete_expense_category/$1') . "'>" . lang('i_m_sure') . "</a> <button class='btn po-close'>" . lang('no') . "</button>\"  rel='popover'><i class=\"fa fa-trash-o\"></i></a></div>", "id");
+
+        echo $this->datatables->generate();
+    }
+
+    function getRegions() {
+        $this->load->library('datatables');
+        $this->datatables
+            ->select("id, code, name")
+            ->from("regions")
+            ->add_column("Actions", "<div class=\"text-center\"><a href='" . admin_url('system_settings/edit_region/$1') . "' data-toggle='modal' data-target='#myModal' class='tip' title='Edit Region'><i class=\"fa fa-edit\"></i></a> <a href='#' class='tip po' title='<b>Delete Region</b>' data-content=\"<p>" . lang('r_u_sure') . "</p><a class='btn btn-danger po-delete' href='" . admin_url('system_settings/delete_region/$1') . "'>" . lang('i_m_sure') . "</a> <button class='btn po-close'>" . lang('no') . "</button>\"  rel='popover'><i class=\"fa fa-trash-o\"></i></a></div>", "id");
 
         echo $this->datatables->generate();
     }
@@ -2009,6 +2026,76 @@ class system_settings extends MY_Controller
         } else {
             $this->session->set_flashdata('error', validation_errors());
             redirect($_SERVER["HTTP_REFERER"]);
+        }
+    }
+
+    function add_region() {
+
+        $this->form_validation->set_rules('code', lang("category_code"), 'trim|is_unique[categories.code]|required');
+        $this->form_validation->set_rules('name', lang("name"), 'required|min_length[3]');
+
+        if ($this->form_validation->run() == true) {
+
+            $data = array(
+                'name' => $this->input->post('name'),
+                'code' => $this->input->post('code'),
+            );
+
+        } elseif ($this->input->post('add_region')) {
+            $this->session->set_flashdata('error', validation_errors());
+            admin_redirect("system_settings/regions");
+        }
+
+        if ($this->form_validation->run() == true && $this->settings_model->addRegion($data)) {
+            $this->session->set_flashdata('message', 'Region added');
+            admin_redirect("system_settings/regions");
+        } else {
+            $this->data['error'] = validation_errors() ? validation_errors() : $this->session->flashdata('error');
+            $this->data['modal_js'] = $this->site->modal_js();
+            $this->load->view($this->theme . 'settings/add_region', $this->data);
+        }
+    }
+
+    function edit_region($id = NULL) {
+
+        $this->form_validation->set_rules('code', lang("category_code"), 'trim|required');
+        $category = $this->settings_model->getRegionByID($id);
+        if ($this->input->post('code') != $category->code) {
+            $this->form_validation->set_rules('code', lang("category_code"), 'required|is_unique[regions.code]');
+        }
+        $this->form_validation->set_rules('name', lang("category_name"), 'required|min_length[3]');
+
+        if ($this->form_validation->run() == true) {
+
+            $data = array(
+                'code' => $this->input->post('code'),
+                'name' => $this->input->post('name')
+            );
+
+        } elseif ($this->input->post('edit_region')) {
+            $this->session->set_flashdata('error', validation_errors());
+            admin_redirect("system_settings/regions");
+        }
+
+        if ($this->form_validation->run() == true && $this->settings_model->updateRegion($id, $data, null)) {
+            $this->session->set_flashdata('message', 'Region updated');
+            admin_redirect("system_settings/regions");
+        } else {
+            $this->data['error'] = validation_errors() ? validation_errors() : $this->session->flashdata('error');
+            $this->data['category'] = $category;
+            $this->data['modal_js'] = $this->site->modal_js();
+            $this->load->view($this->theme . 'settings/edit_region', $this->data);
+        }
+    }
+
+    function delete_region($id = NULL) {
+
+        if ($this->settings_model->hasRegionRecord($id)) {
+            $this->sma->send_json(array('error' => 1, 'msg' => 'Invalid'));
+        }
+
+        if ($this->settings_model->deleteRegion($id)) {
+            $this->sma->send_json(array('error' => 0, 'msg' => 'Region deleted'));
         }
     }
 

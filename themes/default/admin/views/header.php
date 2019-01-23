@@ -576,6 +576,16 @@
                                             <i class="fa fa-user-plus"></i><span class="text"> <?= lang('new_user'); ?></span>
                                         </a>
                                     </li>
+                                    <li id="auth_users">
+                                        <a class="submenu" href="<?= admin_url('employees'); ?>">
+                                            <i class="fa fa-users"></i><span class="text"> List Employees</span>
+                                        </a>
+                                    </li>
+                                    <li id="auth_create_user">
+                                        <a class="submenu" href="<?= admin_url('employees/create_employee'); ?>">
+                                            <i class="fa fa-user-plus"></i><span class="text"> New Employee</span>
+                                        </a>
+                                    </li>
                                     <li id="billers_index">
                                         <a class="submenu" href="<?= admin_url('billers'); ?>">
                                             <i class="fa fa-users"></i><span class="text"> <?= lang('list_billers'); ?></span>
@@ -676,6 +686,11 @@
                                         <li id="system_settings_expense_categories">
                                             <a href="<?= admin_url('system_settings/expense_categories') ?>">
                                                 <i class="fa fa-folder-open"></i><span class="text"> <?= lang('expense_categories'); ?></span>
+                                            </a>
+                                        </li>
+                                        <li id="system_settings_regions">
+                                            <a href="<?= admin_url('system_settings/regions') ?>">
+                                                <i class="fa fa-map-marker"></i><span class="text"> Regions</span>
                                             </a>
                                         </li>
                                         <li id="system_settings_units">
