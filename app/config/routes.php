@@ -44,6 +44,11 @@ $route['admin'] = 'admin/welcome';
 $route['admin/users'] = 'admin/auth/users';
 $route['admin/users/create_user'] = 'admin/auth/create_user';
 $route['admin/users/profile/(:num)'] = 'admin/auth/profile/$1';
+
+$route['admin/employees'] = 'admin/auth/employees';
+$route['admin/employees/create_employee'] = 'admin/auth/create_employee';
+$route['admin/employees/profile/(:num)'] = 'admin/auth/profile/$1';
+
 $route['admin/login'] = 'admin/auth/login';
 $route['admin/login/(:any)'] = 'admin/auth/login/$1';
 $route['admin/logout'] = 'admin/auth/logout';

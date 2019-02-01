@@ -72,6 +72,14 @@ class Site extends CI_Model
         return FALSE;
     }
 
+    public function getAllRegions() {
+        $q = $this->db->get('regions');
+        if ($q->num_rows() > 0) {
+            return $q->result_array();
+        }
+        return FALSE;
+    }
+
     public function getCustomerGroupByID($id) {
         $q = $this->db->get_where('customer_groups', array('id' => $id), 1);
         if ($q->num_rows() > 0) {
@@ -387,6 +395,14 @@ class Site extends CI_Model
         }
         $group_id = $this->getUserGroupID($user_id);
         $q = $this->db->get_where('groups', array('id' => $group_id), 1);
+        if ($q->num_rows() > 0) {
+            return $q->row();
+        }
+        return FALSE;
+    }
+
+    public function getUserGroupByName($name) {
+        $q = $this->db->get_where('groups', array('name' => $name), 1);
         if ($q->num_rows() > 0) {
             return $q->row();
         }

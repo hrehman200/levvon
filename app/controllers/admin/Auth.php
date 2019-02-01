@@ -95,6 +95,54 @@ class Auth extends MY_Controller
         echo $this->datatables->generate();
     }
 
+    function employees() {
+        if ( ! $this->loggedIn) {
+            admin_redirect('login');
+        }
+        if ( ! $this->Owner) {
+            $this->session->set_flashdata('warning', lang('access_denied'));
+            redirect(isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : 'admin/welcome');
+        }
+
+        $this->data['error'] = (validation_errors()) ? validation_errors() : $this->session->flashdata('error');
+
+        $bc = array(array('link' => base_url(), 'page' => 'List Employees'), array('link' => '#', 'page' => 'List Employees'));
+        $meta = array('page_title' => 'Employees', 'bc' => $bc);
+        $this->page_construct('auth/employees', $meta, $this->data);
+    }
+
+    function getEmployees() {
+        if ( ! $this->Owner) {
+            $this->session->set_flashdata('warning', lang('access_denied'));
+            $this->sma->md();
+        }
+
+        $this->load->library('datatables');
+        $this->datatables
+            ->select($this->db->dbprefix('users').".id as id, username, first_name, last_name, email, company, award_points, " . $this->db->dbprefix('regions') . ".name, active")
+            ->from("users")
+            ->join('groups', 'users.group_id=groups.id', 'left')
+            ->join('regions', 'users.region_id=regions.id', 'left')
+            ->group_by('users.id')
+            ->where('company_id', NULL)
+            ->where($this->db->dbprefix('groups').'.name', 'employee')
+            ->edit_column('active', '$1__$2', 'active, id')
+            ->add_column("Actions", "<div class=\"text-center\">
+                <a href='" . admin_url('auth/profile/$1') . "' class='tip' title='" . lang("edit_user") . "'>
+                    <i class=\"fa fa-edit\"></i>
+                </a>
+                <a href='javascript:;' onclick=\"javascript:chatWith($1, '$2');\">
+                    <i class='fa fa-comments'></i>
+                </a>
+            </div>", "id, username")
+            ->unset_column('username');
+
+        if (!$this->Owner) {
+            $this->datatables->unset_column('id');
+        }
+        echo $this->datatables->generate();
+    }
+
     function delete_avatar($id = NULL, $avatar = NULL)
     {
 
@@ -696,6 +744,162 @@ class Auth extends MY_Controller
         }
     }
 
+    function create_employee() {
+        if (!$this->Owner) {
+            $this->session->set_flashdata('warning', lang("access_denied"));
+            redirect($_SERVER["HTTP_REFERER"]);
+        }
+
+        $this->data['title'] = "Create Employee";
+        $this->form_validation->set_rules('username', lang("username"), 'trim|is_unique[users.username]');
+        $this->form_validation->set_rules('email', lang("email"), 'trim|is_unique[users.email]');
+        $this->form_validation->set_rules('status', lang("status"), 'trim|required');
+        $this->form_validation->set_rules('region', "Region", 'trim|required');
+
+        if ($this->form_validation->run() == true) {
+
+            $username = strtolower($this->input->post('username'));
+            $email = strtolower($this->input->post('email'));
+            $password = $this->input->post('password');
+            $notify = $this->input->post('notify');
+
+            $additional_data = array(
+                'first_name' => $this->input->post('first_name'),
+                'last_name' => $this->input->post('last_name'),
+                'company' => $this->input->post('company'),
+                'phone' => $this->input->post('phone'),
+                'gender' => $this->input->post('gender'),
+                'group_id' => $this->site->getUserGroupByName('employee')->id,
+                'region_id' => $this->input->post('region') ? $this->input->post('region') : 1,
+                'biller_id' => $this->input->post('biller'),
+                'warehouse_id' => $this->input->post('warehouse'),
+                'view_right' => $this->input->post('view_right'),
+                'edit_right' => $this->input->post('edit_right'),
+                'allow_discount' => $this->input->post('allow_discount'),
+            );
+            $active = $this->input->post('status');
+        }
+        if ($this->form_validation->run() == true && $this->ion_auth->register($username, $password, $email, $additional_data, $active, $notify)) {
+
+            $this->session->set_flashdata('message', $this->ion_auth->messages());
+            admin_redirect("auth/employees");
+
+        } else {
+
+            $this->data['error'] = (validation_errors() ? validation_errors() : ($this->ion_auth->errors() ? $this->ion_auth->errors() : $this->session->flashdata('error')));
+            $this->data['groups'] = $this->ion_auth->groups()->result_array();
+            $this->data['regions'] = $this->site->getAllRegions();
+            $this->data['billers'] = $this->site->getAllCompanies('biller');
+            $this->data['warehouses'] = $this->site->getAllWarehouses();
+            $bc = array(array('link' => admin_url('home'), 'page' => lang('home')), array('link' => admin_url('auth/employees'), 'page' => 'Employees'), array('link' => '#', 'page' => 'Create Employee'));
+            $meta = array('page_title' => 'Employees', 'bc' => $bc);
+            $this->page_construct('auth/create_employee', $meta, $this->data);
+        }
+    }
+
+    function edit_employee($id = NULL) {
+
+        if ($this->input->post('id')) {
+            $id = $this->input->post('id');
+        }
+        $this->data['title'] = lang("edit_user");
+
+        if (!$this->loggedIn || !$this->Owner && $id != $this->session->userdata('user_id')) {
+            $this->session->set_flashdata('warning', lang("access_denied"));
+            redirect($_SERVER["HTTP_REFERER"]);
+        }
+
+        $user = $this->ion_auth->user($id)->row();
+
+        if ($user->username != $this->input->post('username')) {
+            $this->form_validation->set_rules('username', lang("username"), 'trim|is_unique[employees.username]');
+        }
+        if ($user->email != $this->input->post('email')) {
+            $this->form_validation->set_rules('email', lang("email"), 'trim|is_unique[employees.email]');
+        }
+
+        if ($this->form_validation->run() === TRUE) {
+
+            if ($this->Owner) {
+                if ($id == $this->session->userdata('user_id')) {
+                    $data = array(
+                        'first_name' => $this->input->post('first_name'),
+                        'last_name' => $this->input->post('last_name'),
+                        'company' => $this->input->post('company'),
+                        'phone' => $this->input->post('phone'),
+                        'gender' => $this->input->post('gender'),
+                    );
+                } elseif ($this->ion_auth->in_group('customer', $id) || $this->ion_auth->in_group('supplier', $id)) {
+                    $data = array(
+                        'first_name' => $this->input->post('first_name'),
+                        'last_name' => $this->input->post('last_name'),
+                        'company' => $this->input->post('company'),
+                        'phone' => $this->input->post('phone'),
+                        'gender' => $this->input->post('gender'),
+                    );
+                } else {
+                    $data = array(
+                        'first_name' => $this->input->post('first_name'),
+                        'last_name' => $this->input->post('last_name'),
+                        'company' => $this->input->post('company'),
+                        'username' => $this->input->post('username'),
+                        'email' => $this->input->post('email'),
+                        'phone' => $this->input->post('phone'),
+                        'gender' => $this->input->post('gender'),
+                        'active' => $this->input->post('status'),
+                        'group_id' => $this->input->post('group'),
+                        'biller_id' => $this->input->post('biller') ? $this->input->post('biller') : NULL,
+                        'warehouse_id' => $this->input->post('warehouse') ? $this->input->post('warehouse') : NULL,
+                        'award_points' => $this->input->post('award_points'),
+                        'view_right' => $this->input->post('view_right'),
+                        'edit_right' => $this->input->post('edit_right'),
+                        'allow_discount' => $this->input->post('allow_discount'),
+                    );
+                }
+
+            } elseif ($this->Admin) {
+                $data = array(
+                    'first_name' => $this->input->post('first_name'),
+                    'last_name' => $this->input->post('last_name'),
+                    'company' => $this->input->post('company'),
+                    'phone' => $this->input->post('phone'),
+                    'gender' => $this->input->post('gender'),
+                    'active' => $this->input->post('status'),
+                    'award_points' => $this->input->post('award_points'),
+                );
+            } else {
+                $data = array(
+                    'first_name' => $this->input->post('first_name'),
+                    'last_name' => $this->input->post('last_name'),
+                    'company' => $this->input->post('company'),
+                    'phone' => $this->input->post('phone'),
+                    'gender' => $this->input->post('gender'),
+                );
+            }
+
+            if ($this->Owner) {
+                if ($this->input->post('password')) {
+                    if (DEMO) {
+                        $this->session->set_flashdata('warning', lang('disabled_in_demo'));
+                        redirect($_SERVER["HTTP_REFERER"]);
+                    }
+                    $this->form_validation->set_rules('password', lang('edit_user_validation_password_label'), 'required|min_length[8]|max_length[25]|matches[password_confirm]');
+                    $this->form_validation->set_rules('password_confirm', lang('edit_user_validation_password_confirm_label'), 'required');
+
+                    $data['password'] = $this->input->post('password');
+                }
+            }
+            //$this->sma->print_arrays($data);
+
+        }
+        if ($this->form_validation->run() === TRUE && $this->ion_auth->update($user->id, $data)) {
+            $this->session->set_flashdata('message', lang('user_updated'));
+            admin_redirect("auth/profile/" . $id);
+        } else {
+            $this->session->set_flashdata('error', validation_errors());
+            redirect($_SERVER["HTTP_REFERER"]);
+        }
+    }
 
     function _get_csrf_nonce()
     {
